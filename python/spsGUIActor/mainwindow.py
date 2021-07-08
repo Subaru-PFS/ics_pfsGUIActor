@@ -3,7 +3,7 @@ __author__ = 'alefur'
 import spsGUIActor.styles as styles
 from PyQt5.QtWidgets import QWidget, QMessageBox, QGroupBox, QLabel, QDial
 from spsGUIActor.common import GridLayout, HBoxLayout
-from spsGUIActor.module import Aitmodule, Specmodule
+from spsGUIActor.module import AitModule, SpecModule, SpsModule
 from spsGUIActor.widgets import ValueGB
 
 
@@ -73,15 +73,22 @@ class SpsWidget(QWidget):
         self.mainLayout.setContentsMargins(0, 0, 0, 0)
 
         self.mainLayout.addLayout(self.tronLayout, 0, 0)
-        self.mainLayout.addWidget(Aitmodule(self), 1, 0)
+        rowNumber = 1
+        aitActors = [actor.strip() for actor in self.actor.config.get('ait', 'actors').split(',')]
+        spsActors = ['sps'] + [actor.strip() for actor in self.actor.config.get('sps', 'actors').split(',')]
 
-        for smId in range(1, 12):
-            if 'sm%d' % smId not in self.actor.config.sections():
-                continue
+        if aitActors:
+            self.mainLayout.addWidget(AitModule(self, aitActors), rowNumber, 0)
+            rowNumber += 1
 
+        if spsActors:
+            self.mainLayout.addWidget(SpsModule(self, spsActors), rowNumber, 0)
+            rowNumber += 1
+
+        for smId in self.smIds:
             arms = [arm.strip() for arm in self.actor.config.get('sm%d' % smId, 'arms').split(',') if arm]
             enu = self.actor.config.getboolean('sm%d' % smId, 'enu')
-            self.mainLayout.addWidget(Specmodule(self, smId=smId, enu=enu, arms=arms), smId + 1, 0)
+            self.mainLayout.addWidget(SpecModule(self, smId=smId, enu=enu, arms=arms), smId + rowNumber, 0)
 
         self.setLayout(self.mainLayout)
 
@@ -92,6 +99,10 @@ class SpsWidget(QWidget):
     @property
     def isConnected(self):
         return self.spsGUI.isConnected
+
+    @property
+    def smIds(self):
+        return [smId for smId in range(1, 12) if f'sm{smId}' in self.actor.config.sections()]
 
     def sendCommand(self, actor, cmdStr, callFunc):
         import opscore.actor.keyvar as keyvar

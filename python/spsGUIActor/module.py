@@ -10,7 +10,7 @@ from spsGUIActor.common import GridLayout
 from spsGUIActor.enu import EnuRow
 from spsGUIActor.rough import RoughRow
 from spsGUIActor.sac import SacRow
-from spsGUIActor.sps import SpecModuleRow
+from spsGUIActor.sps import SpsRow
 
 
 class Module(QGroupBox):
@@ -46,42 +46,29 @@ class Module(QGroupBox):
         QGroupBox.setStyleSheet(self, styleSheet)
 
 
-class Aitmodule(Module):
-    def __init__(self, mwindow):
+class AitModule(Module):
+    def __init__(self, mwindow, aitActors):
         Module.__init__(self, mwindow=mwindow, title='AIT')
-        actors = [actor.strip() for actor in mwindow.actor.config.get('ait', 'actors').split(',')]
 
-        self.dcbs = []
-
-        if 'dcb' in actors:
-            self.dcbs += dcb.DcbRow(self).rows
-        if 'dcb2' in actors:
-            self.dcbs += dcb.DcbRow(self, 'dcb2').rows
-
-        self.aten = AtenRow(self).rows if 'aten' in actors else []
-
-        self.sac = [SacRow(self)] if 'sac' in actors else []
-        self.breva = [BrevaRow(self)] if 'breva' in actors else []
-        roughs = ['rough1'] if 'rough1' in actors else []
-        roughs += (['rough2'] if 'rough2' in actors else [])
-
-        self.roughs = [RoughRow(self, rough) for rough in roughs]
+        self.aten = AtenRow(self).rows if 'aten' in aitActors else []
+        self.sac = [SacRow(self)] if 'sac' in aitActors else []
+        self.breva = [BrevaRow(self)] if 'breva' in aitActors else []
 
         self.populateLayout()
         self.adjustSize()
 
     @property
     def rows(self):
-        return self.dcbs + self.aten + self.sac + self.breva + self.roughs
+        return self.aten + self.sac + self.breva
 
 
-class Specmodule(Module):
+class SpecModule(Module):
     def __init__(self, mwindow, smId, enu=True, arms=None):
         Module.__init__(self, mwindow=mwindow, title='Spectrograph Module %i' % smId)
         arms = ['b', 'r', 'n'] if arms is None else arms
 
         self.smId = smId
-        self.spec = [SpecModuleRow(self, smId), EnuRow(self)] if enu else []
+        self.enu = [EnuRow(self)] if enu else []
         self.cams = [CamRow(self, arm=arm) for arm in arms]
 
         self.populateLayout()
@@ -89,4 +76,30 @@ class Specmodule(Module):
 
     @property
     def rows(self):
-        return self.spec + self.cams
+        return self.enu + self.cams
+
+
+class SpsModule(Module):
+    def __init__(self, mwindow, spsActors):
+        Module.__init__(self, mwindow=mwindow, title='Spectrograph System')
+
+        self.dcbs = []
+
+        if 'dcb' in spsActors:
+            self.dcbs += dcb.DcbRow(self).rows
+        if 'dcb2' in spsActors:
+            self.dcbs += dcb.DcbRow(self, 'dcb2').rows
+
+        roughs = ['rough1'] if 'rough1' in spsActors else []
+        roughs += (['rough2'] if 'rough2' in spsActors else [])
+
+        self.roughs = [RoughRow(self, rough) for rough in roughs]
+        self.sps = SpsRow(self)
+
+        self.populateLayout()
+        self.adjustSize()
+
+
+    @property
+    def rows(self):
+        return self.dcbs + self.roughs + [self.sps]
