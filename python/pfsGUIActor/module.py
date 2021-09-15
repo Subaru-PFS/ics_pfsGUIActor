@@ -90,3 +90,15 @@ class SpecModule(Module):
     @property
     def rows(self):
         return self.spec + self.cams
+
+
+class PfiModule(Module):
+    def __init__(self, mwindow):
+        Module.__init__(self, mwindow=mwindow, title='PFI')
+
+        self.populateLayout()
+        self.adjustSize()
+
+    @property
+    def rows(self):
+        return []

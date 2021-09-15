@@ -3,7 +3,7 @@ __author__ = 'alefur'
 import pfsGUIActor.styles as styles
 from PyQt5.QtWidgets import QWidget, QMessageBox, QGroupBox, QLabel, QDial
 from pfsGUIActor.common import GridLayout, HBoxLayout
-from pfsGUIActor.module import SpsAitModule, SpecModule
+from pfsGUIActor.module import SpsAitModule, SpecModule, PfiModule
 from pfsGUIActor.widgets import ValueGB
 
 
@@ -74,14 +74,19 @@ class SpsWidget(QWidget):
 
         self.mainLayout.addLayout(self.tronLayout, 0, 0)
         self.mainLayout.addWidget(SpsAitModule(self), 1, 0)
+        nRow = 1
 
         for smId in range(1, 12):
             if 'sm%d' % smId not in self.actor.config.sections():
                 continue
 
+            nRow += 1
             arms = [arm.strip() for arm in self.actor.config.get('sm%d' % smId, 'arms').split(',') if arm]
             enu = self.actor.config.getboolean('sm%d' % smId, 'enu')
-            self.mainLayout.addWidget(SpecModule(self, smId=smId, enu=enu, arms=arms), smId + 1, 0)
+            self.mainLayout.addWidget(SpecModule(self, smId=smId, enu=enu, arms=arms), nRow, 0)
+
+        if 'pfi' in self.actor.config.sections():
+            self.mainLayout.addWidget(PfiModule(self), nRow + 1, 0)
 
         self.setLayout(self.mainLayout)
 
