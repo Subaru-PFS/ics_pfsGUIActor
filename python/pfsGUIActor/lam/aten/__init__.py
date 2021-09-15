@@ -1,8 +1,8 @@
 __author__ = 'alefur'
 
 import pfsGUIActor.styles as styles
-from pfsGUIActor.aten.labsphere import LabspherePanel, AttenuatorValue
-from pfsGUIActor.aten.pdu import PduPanel
+from pfsGUIActor.lam.aten.labsphere import LabspherePanel, AttenuatorValue
+from pfsGUIActor.lam.aten.pdu import PduPanel
 from pfsGUIActor.control import ControlDialog
 from pfsGUIActor.enu import ConnectCmd
 from pfsGUIActor.modulerow import ModuleRow, RowWidget

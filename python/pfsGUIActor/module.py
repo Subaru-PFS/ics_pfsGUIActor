@@ -1,15 +1,13 @@
 __author__ = 'alefur'
 
 import pfsGUIActor.dcb as dcb
+import pfsGUIActor.lam as lamAIT
 import pfsGUIActor.styles as styles
 from PyQt5.QtWidgets import QGroupBox
-from pfsGUIActor.aten import AtenRow
-from pfsGUIActor.breva import BrevaRow
 from pfsGUIActor.cam import CamRow
 from pfsGUIActor.common import GridLayout
 from pfsGUIActor.enu import EnuRow
 from pfsGUIActor.rough import RoughRow
-from pfsGUIActor.sac import SacRow
 from pfsGUIActor.sps import SpecModuleRow
 
 
@@ -46,7 +44,7 @@ class Module(QGroupBox):
         QGroupBox.setStyleSheet(self, styleSheet)
 
 
-class Aitmodule(Module):
+class SpsAitModule(Module):
     def __init__(self, mwindow):
         Module.__init__(self, mwindow=mwindow, title='AIT')
         actors = [actor.strip() for actor in mwindow.actor.config.get('ait', 'actors').split(',')]
@@ -58,10 +56,12 @@ class Aitmodule(Module):
         if 'dcb2' in actors:
             self.dcbs += dcb.DcbRow(self, 'dcb2').rows
 
-        self.aten = AtenRow(self).rows if 'aten' in actors else []
+        lamAITRows = [lamAIT.aten.AtenRow(self).rows] if 'aten' in actors else []
+        lamAITRows += [lamAIT.sac.SacRow(self)] if 'sac' in actors else []
+        lamAITRows += [lamAIT.breva.BrevaRow(self)] if 'breva' in actors else []
 
-        self.sac = [SacRow(self)] if 'sac' in actors else []
-        self.breva = [BrevaRow(self)] if 'breva' in actors else []
+        self.lamAITRows = lamAITRows
+
         roughs = ['rough1'] if 'rough1' in actors else []
         roughs += (['rough2'] if 'rough2' in actors else [])
 
@@ -72,10 +72,10 @@ class Aitmodule(Module):
 
     @property
     def rows(self):
-        return self.dcbs + self.aten + self.sac + self.breva + self.roughs
+        return self.dcbs + self.roughs + self.lamAITRows
 
 
-class Specmodule(Module):
+class SpecModule(Module):
     def __init__(self, mwindow, smId, enu=True, arms=None):
         Module.__init__(self, mwindow=mwindow, title='Spectrograph Module %i' % smId)
         arms = ['b', 'r', 'n'] if arms is None else arms

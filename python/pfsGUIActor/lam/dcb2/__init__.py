@@ -2,7 +2,7 @@ __author__ = 'alefur'
 
 from pfsGUIActor.control import ControlDialog
 from pfsGUIActor.dcb import FiberConfig
-from pfsGUIActor.dcb2.sources import SourcesPanel
+from pfsGUIActor.lam.dcb2.sources import SourcesPanel
 from pfsGUIActor.dcb.filterwheel import FilterwheelPanel
 from pfsGUIActor.enu import ConnectCmd
 from pfsGUIActor.modulerow import ModuleRow, RowWidget

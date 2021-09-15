@@ -2,8 +2,8 @@ __author__ = 'alefur'
 
 from pfsGUIActor.control import ControlDialog
 from pfsGUIActor.modulerow import ModuleRow
-from pfsGUIActor.sac.ccd import CcdPanel
-from pfsGUIActor.sac.stage import StagePanel
+from pfsGUIActor.lam.sac.ccd import CcdPanel
+from pfsGUIActor.lam.sac.stage import StagePanel
 from pfsGUIActor.widgets import ValueMRow
 
 

@@ -3,7 +3,7 @@ import pfsGUIActor.styles as styles
 from pfsGUIActor.control import ControllerPanel, ControllerCmd
 from pfsGUIActor.widgets import ValueGB, SwitchGB, CustomedCmd, SpinBoxGB, SwitchButton, ValueMRow
 from pfsGUIActor.enu import EnuDeviceCmd
-from pfsGUIActor.aten.pdu import PduButton
+from pfsGUIActor.lam.aten.pdu import PduButton
 from pfsGUIActor.dcb.sources import SwitchLamp
 
 class AttenuatorValue(ValueMRow):
