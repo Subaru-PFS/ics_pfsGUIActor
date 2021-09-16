@@ -9,7 +9,7 @@ from pfsGUIActor.common import GridLayout
 from pfsGUIActor.enu import EnuRow
 from pfsGUIActor.rough import RoughRow
 from pfsGUIActor.sps import SpecModuleRow
-
+from pfsGUIActor.peb import PebRow
 
 class Module(QGroupBox):
     def __init__(self, mwindow, title):
@@ -95,10 +95,11 @@ class SpecModule(Module):
 class PfiModule(Module):
     def __init__(self, mwindow):
         Module.__init__(self, mwindow=mwindow, title='PFI')
+        self.peb = PebRow(self)
 
         self.populateLayout()
         self.adjustSize()
 
     @property
     def rows(self):
-        return []
+        return [self.peb]
