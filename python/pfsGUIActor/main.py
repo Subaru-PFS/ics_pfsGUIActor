@@ -76,7 +76,7 @@ def main():
     enus = ['enu_sm%i' % i for i in specIds]
     lam = ['aten', 'sac', 'breva']
     sps = ['sps', 'dcb', 'dcb2', 'rough1', 'rough2']
-    pfi = ['peb']
+    pfi = ['peb', 'pfilamps']
 
     actor = miniActor.connectActor(['hub'] + lam + sps + enus + xcus + ccds + hxs + pfi)
 

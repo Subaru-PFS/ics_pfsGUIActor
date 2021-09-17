@@ -5,10 +5,10 @@ from PyQt5.QtWidgets import QGridLayout
 from pfsGUIActor.common import ComboBox
 from pfsGUIActor.control import ControlPanel, CommandsGB, ControlDialog
 from pfsGUIActor.modulerow import ModuleRow
-from pfsGUIActor.peb.flow import FlowPanel
-from pfsGUIActor.peb.temps import TempsPanel
-from pfsGUIActor.peb.power import PowerPanel
-from pfsGUIActor.peb.led import LedPanel
+from pfsGUIActor.pfi.peb.flow import FlowPanel
+from pfsGUIActor.pfi.peb.temps import TempsPanel
+from pfsGUIActor.pfi.peb.power import PowerPanel
+from pfsGUIActor.pfi.peb.led import LedPanel
 from pfsGUIActor.widgets import Coordinates, SwitchGB, DoubleSpinBoxGB, CustomedCmd, CmdButton, ValueMRow, Controllers, ValueGB
 
 
