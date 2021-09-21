@@ -104,4 +104,4 @@ class PfiModule(Module):
 
     @property
     def rows(self):
-        return [self.peb]
+        return [self.peb, self.pfiLamps]

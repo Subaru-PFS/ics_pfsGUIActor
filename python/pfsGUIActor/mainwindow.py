@@ -100,12 +100,11 @@ class SpsWidget(QWidget):
 
     def sendCommand(self, actor, cmdStr, callFunc):
         import opscore.actor.keyvar as keyvar
-        print(f'sending {actor} {cmdStr}')
-        # self.actor.cmdr.bgCall(**dict(actor=actor,
-        #                               cmdStr=cmdStr,
-        #                               timeLim=1600,
-        #                               callFunc=callFunc,
-        #                               callCodes=keyvar.AllCodes))
+        self.actor.cmdr.bgCall(**dict(actor=actor,
+                                      cmdStr=cmdStr,
+                                      timeLim=1600,
+                                      callFunc=callFunc,
+                                      callCodes=keyvar.AllCodes))
 
     def heartBeat(self):
         self.tronLayout.tronStatus.dial.heartBeat()
