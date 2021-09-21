@@ -4,6 +4,7 @@ from pfsGUIActor.common import ComboBox
 from pfsGUIActor.control import ControllerPanel, ControllerCmd
 from pfsGUIActor.enu import EnuDeviceCmd
 from pfsGUIActor.widgets import ValueGB, CustomedCmd, CmdButton, ValuesRow
+from pfsGUIActor.cam import CamDevice
 
 
 class TempsPanel(ControllerPanel):
@@ -12,6 +13,7 @@ class TempsPanel(ControllerPanel):
                   'Ebox 3', 'Flow in', 'Flow out']
 
     def __init__(self, controlDialog):
+       # CamDevice.__init__(self, controlDialog, 'temps')
         ControllerPanel.__init__(self, controlDialog, 'temps')
         self.addCommandSet(TempsCommands(self))
 
@@ -24,7 +26,7 @@ class TempsPanel(ControllerPanel):
 
     def setInLayout(self):
         for i, value in enumerate(self.temps):
-            self.grid.addWidget(value, i // 6, i % 6)
+            self.grid.addWidget(value, i // 3, i % 3)
 
 
 class TempsCommands(ControllerCmd):

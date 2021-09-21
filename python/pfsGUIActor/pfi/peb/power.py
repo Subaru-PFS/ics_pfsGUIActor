@@ -7,29 +7,50 @@ from pfsGUIActor.widgets import ValueGB, CustomedCmd, CmdButton, ValuesRow, Swit
 
 
 class SwitchPEB(SwitchButton):
-    def __init__(self, controlPanel, label, ind, identifier):
-        cmdStrOn = f'{controlPanel.actorName} power on {identifier}'
-        cmdStrOff = f'{controlPanel.actorName} power off {identifier}'
-        SwitchButton.__init__(self, controlPanel=controlPanel, key='power', ind=ind, label=label, fmt='{:d}',
-                              cmdHead='', cmdStrOn=cmdStrOn, cmdStrOff=cmdStrOff)
+    def __init__(self, controlPanel, identifier):
+        cmdStrOn = f'{controlPanel.actorName} power on {identifier.outletId}'
+        cmdStrOff = f'{controlPanel.actorName} power off {identifier.outletId}'
+        SwitchButton.__init__(self, controlPanel=controlPanel, key='power', ind=identifier.keyId,
+                              label=identifier.outletName, fmt='{:d}', cmdHead='', cmdStrOn=cmdStrOn,
+                              cmdStrOff=cmdStrOff)
 
 
-class SwitchAGC(SwitchPEB):
-    def __init__(self, controlPanel, agcId):
-        SwitchPEB.__init__(self, controlPanel, f'AGC {agcId}', agcId - 1, f'agc ids={agcId}')
+class BouncePEB(SwitchButton):
+    def __init__(self, controlPanel, identifier):
+        cmdStrOn = f'{controlPanel.actorName} power bounce {identifier.outletId}'
+        cmdStrOff = f'{controlPanel.actorName} power bounce {identifier.outletId}'
+        SwitchButton.__init__(self, controlPanel=controlPanel, key='power', ind=identifier.keyId,
+                              label=identifier.outletName, labelOn='BOUNCE', labelOff='BOUNCE',
+                              fmt='{:d}', cmdHead='', cmdStrOn=cmdStrOn, cmdStrOff=cmdStrOff)
+
+
+class PebSwitchIdentifier(object):
+    def __init__(self, outletName, keyId, outletId):
+        self.outletName = outletName
+        self.keyId = keyId
+        self.outletId = outletId
+
+
+class AGCIdentifier(PebSwitchIdentifier):
+    def __init__(self, agcId):
+        PebSwitchIdentifier.__init__(self, f'AGC {agcId}', agcId - 1, f'agc id={agcId}')
 
 
 class PowerPanel(ControllerPanel):
-    outletsNames = ['AGC 1', 'AGC 2', 'AGC 3', 'AGC 4', 'AGC 5', 'AGC 6', 'Leakage', 'Adam6015', 'USB 1', 'USB 2',
-                    'Flow board', 'LED board', 'Switch']
+    switches = [AGCIdentifier(i + 1) for i in range(6)] + \
+               [PebSwitchIdentifier('Leakage', 6, 'leakage')] + [PebSwitchIdentifier('Adam6015', 7, 'adam')] + \
+               [PebSwitchIdentifier('USB_1', 10, 'usb id=1')] + [PebSwitchIdentifier('USB_2', 11, 'usb id=2')]
+
+    bounces = [PebSwitchIdentifier('Flow Board', 8, 'boardb')] + [PebSwitchIdentifier('Led Board', 9, 'boardc')] + \
+              [PebSwitchIdentifier('Switch', 12, 'switch')]
 
     def __init__(self, controlDialog):
         ControllerPanel.__init__(self, controlDialog, 'power')
         self.addCommandSet(PowerCommands(self))
 
     def createWidgets(self):
-        self.outlets = [SwitchGB(self.moduleRow, 'power', outlet, index, '{:d}') for index, outlet in
-                        enumerate(self.outletsNames)]
+        self.outlets = [SwitchGB(self.moduleRow, 'power', identifier.outletName, identifier.keyId, '{:d}')
+                        for identifier in PowerPanel.switches + PowerPanel.bounces]
 
     def setInLayout(self):
         for i, value in enumerate(self.outlets):
@@ -40,15 +61,9 @@ class PowerCommands(ControllerCmd):
     def __init__(self, controlPanel):
         ControllerCmd.__init__(self, controlPanel)
 
-        for i in range(6):
-            self.grid.addWidget(SwitchAGC(controlPanel, agcId=i + 1), 1 + i // 3, i % 3)
-        #
-        for label, ind, identifier in [('Leakage', 6, 'leakage'), ('Adam6015', 7, 'adam'), ('USB-1', 10, 'usb ids=1'),
-                                       ('USB-2', 11, 'usb ids=2')]:
-            i+=1
-            self.grid.addWidget(SwitchPEB(controlPanel, label, ind, identifier),   1 + i // 3, i % 3)
+        for i, identifier in enumerate(controlPanel.switches):
+            self.grid.addWidget(SwitchPEB(controlPanel, identifier), 1 + i // 3, i % 3)
 
-        for label, ind, identifier in [('Flow Board', 8, 'boardb'), ('LED Board', 9, 'boardc'), ('Switch', 12, 'switch')]:
-            i += 1
-            pass
-
+        for j, identifier in enumerate(controlPanel.bounces):
+            j += (i + 1)
+            self.grid.addWidget(BouncePEB(controlPanel, identifier), 1 + j // 3, j % 3)
