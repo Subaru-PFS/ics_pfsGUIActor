@@ -88,6 +88,7 @@ class ControlDialog(QDialog):
         self.setLayout(self.vbox)
         self.setWindowTitle(title)
         self.setVisible(False)
+        self.move(*self.moduleRow.mwindow.pfsGUI.appCenter)
 
     def rawLogArea(self):
         return RawLogArea(self.moduleRow.actorName)

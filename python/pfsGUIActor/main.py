@@ -6,23 +6,26 @@ import pwd
 import sys
 
 from PyQt5.QtWidgets import QApplication, QMainWindow
+
 from mainwindow import SpsWidget
 
 
 class PFSGUI(QMainWindow):
-    def __init__(self, reactor, actor, cmdrName):
+    def __init__(self, reactor, actor, cmdrName, screen):
         QMainWindow.__init__(self)
         self.reactor = reactor
         self.actor = actor
         self.actor.connectionMade = self.connectionMade
         self.setName("%s.%s" % ("pfsGUIActor", cmdrName))
         self.isConnected = False
+        self.appCenter = screen.width() / 2, screen.height() / 2
 
         self.spsWidget = SpsWidget(self)
         self.setCentralWidget(self.spsWidget)
 
-        #self.setMaximumHeight(100)
+        # self.setMaximumHeight(100)
         self.show()
+        self.move(*self.appCenter)
         self.setConnected(False)
 
     def setConnected(self, isConnected):
@@ -52,7 +55,7 @@ class PFSGUI(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
-
+    screen = app.desktop().screenGeometry()
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--name', default=pwd.getpwuid(os.getuid()).pw_name, type=str, nargs='?', help='cmdr name')
@@ -81,7 +84,7 @@ def main():
     actor = miniActor.connectActor(['hub'] + lam + sps + enus + xcus + ccds + hxs + pfi)
 
     try:
-        ex = PFSGUI(reactor, actor, args.name)
+        ex = PFSGUI(reactor, actor, args.name, screen)
     except:
         actor.disconnectActor()
         raise
