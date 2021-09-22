@@ -18,14 +18,13 @@ class PFSGUI(QMainWindow):
         self.actor.connectionMade = self.connectionMade
         self.setName("%s.%s" % ("pfsGUIActor", cmdrName))
         self.isConnected = False
-        self.appCenter = screen.width() / 2, screen.height() / 2
-
+        self.screenWidth = screen.width()
+        self.screenHeight= screen.height()
         self.spsWidget = SpsWidget(self)
         self.setCentralWidget(self.spsWidget)
 
-        # self.setMaximumHeight(100)
         self.show()
-        self.move(*self.appCenter)
+        self.move(self.screenWidth*0.1, self.screenHeight*0.1)
         self.setConnected(False)
 
     def setConnected(self, isConnected):

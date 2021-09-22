@@ -88,7 +88,7 @@ class ControlDialog(QDialog):
         self.setLayout(self.vbox)
         self.setWindowTitle(title)
         self.setVisible(False)
-        self.move(*self.moduleRow.mwindow.pfsGUI.appCenter)
+        self.move(self.moduleRow.mwindow.pfsGUI.screenWidth*0.3, self.moduleRow.mwindow.pfsGUI.screenHeight*0.5)
 
     def rawLogArea(self):
         return RawLogArea(self.moduleRow.actorName)
@@ -119,7 +119,8 @@ class ControlDialog(QDialog):
         self.cmdBuffer.clear()
 
     def close(self):
-        self.setVisible(False)
+        self.hide()
+       # self.setVisible(False)
 
     def setEnabled(self, a0: bool):
         for widget in [self.topbar] + self.pannels:
