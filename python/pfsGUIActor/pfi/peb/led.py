@@ -46,7 +46,7 @@ class LedPowerCmd(CustomedCmd):
         self.addWidget(self.state, 0, 1)
 
     def buildCmd(self):
-        cmdStr = '%s led setPower %s' % (self.controlPanel.actorName, self.state.currentText())
+        cmdStr = '%s led %s' % (self.controlPanel.actorName, self.state.currentText().lower())
         return cmdStr
 
 
