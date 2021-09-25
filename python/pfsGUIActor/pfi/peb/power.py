@@ -39,7 +39,7 @@ class AGCIdentifier(PebSwitchIdentifier):
 class PowerPanel(ControllerPanel):
     switches = [AGCIdentifier(i + 1) for i in range(6)] + \
                [PebSwitchIdentifier('Leakage', 6, 'leakage')] + [PebSwitchIdentifier('Adam6015', 7, 'adam')] + \
-               [PebSwitchIdentifier('USB_1', 10, 'usb id=1')] + [PebSwitchIdentifier('USB_2', 11, 'usb id=2')]
+               [PebSwitchIdentifier('USB_1', 10, 'usb ids=1')] + [PebSwitchIdentifier('USB_2', 11, 'usb ids=2')]
 
     bounces = [PebSwitchIdentifier('Flow Board', 8, 'boardb')] + [PebSwitchIdentifier('Led Board', 9, 'boardc')] + \
               [PebSwitchIdentifier('Switch', 12, 'switch')]
