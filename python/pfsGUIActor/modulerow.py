@@ -53,7 +53,7 @@ class ModuleRow(object):
 
     def showDetails(self):
         self.controlDialog.activateWindow()
-        self.controlDialog.setVisible(True)
+        self.controlDialog.show()
 
 
 class ActorGB(ValueGB, QGroupBox):

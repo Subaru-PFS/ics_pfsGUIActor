@@ -9,7 +9,8 @@ from pfsGUIActor.common import GridLayout
 from pfsGUIActor.enu import EnuRow
 from pfsGUIActor.rough import RoughRow
 from pfsGUIActor.sps import SpecModuleRow
-
+from pfsGUIActor.pfi.peb import PebRow
+from pfsGUIActor.pfi.pfilamps import PfiLampsRow
 
 class Module(QGroupBox):
     def __init__(self, mwindow, title):
@@ -90,3 +91,17 @@ class SpecModule(Module):
     @property
     def rows(self):
         return self.spec + self.cams
+
+
+class PfiModule(Module):
+    def __init__(self, mwindow):
+        Module.__init__(self, mwindow=mwindow, title='PFI')
+        self.peb = PebRow(self)
+        self.pfiLamps = PfiLampsRow(self)
+
+        self.populateLayout()
+        self.adjustSize()
+
+    @property
+    def rows(self):
+        return [self.peb, self.pfiLamps]
