@@ -5,10 +5,10 @@ from pfsGUIActor.enu import EnuDeviceCmd
 from pfsGUIActor.widgets import ValueGB, CustomedCmd, SwitchGB, SpinBoxGB, SwitchButton
 
 
-class BiaPeriod(ValueGB):
+class BiaPower(ValueGB):
     def __init__(self, moduleRow):
-        self.spinbox = SpinBoxGB('Period', 0, 65536)
-        ValueGB.__init__(self, moduleRow, 'biaConfig', '', 1, '{:d}')
+        self.spinbox = SpinBoxGB('Power', 1, 100)
+        ValueGB.__init__(self, moduleRow, 'biaStatus', '', 0, '{:d}')
 
     def setText(self, txt):
         if not self.spinbox.locked:
@@ -18,10 +18,10 @@ class BiaPeriod(ValueGB):
         return self.spinbox.getValue()
 
 
-class BiaDuty(ValueGB):
+class StrobePeriod(ValueGB):
     def __init__(self, moduleRow):
-        self.spinbox = SpinBoxGB('Duty', 0, 255)
-        ValueGB.__init__(self, moduleRow, 'biaConfig', '', 2, '{:d}')
+        self.spinbox = SpinBoxGB('Period', 10, 10000)
+        ValueGB.__init__(self, moduleRow, 'biaStatus', '', 1, '{:d}')
 
     def setText(self, txt):
         if not self.spinbox.locked:
@@ -31,12 +31,26 @@ class BiaDuty(ValueGB):
         return self.spinbox.getValue()
 
 
-class SetBiaParamCmd(CustomedCmd):
+class StrobeDuty(ValueGB):
+    def __init__(self, moduleRow):
+        self.spinbox = SpinBoxGB('Duty', 1, 100)
+        ValueGB.__init__(self, moduleRow, 'biaStatus', '', 2, '{:d}')
+
+    def setText(self, txt):
+        if not self.spinbox.locked:
+            self.spinbox.setValue(txt)
+
+    def getValue(self):
+        return self.spinbox.getValue()
+
+
+
+class SetStrobeParamCmd(CustomedCmd):
     def __init__(self, controlPanel):
-        CustomedCmd.__init__(self, controlPanel=controlPanel, buttonLabel='SET PARAMETERS')
+        CustomedCmd.__init__(self, controlPanel=controlPanel, buttonLabel='SET STROBE')
 
-        self.period = BiaPeriod(moduleRow=self.controlPanel.moduleRow)
-        self.duty = BiaDuty(moduleRow=self.controlPanel.moduleRow)
+        self.period = StrobePeriod(moduleRow=self.controlPanel.moduleRow)
+        self.duty = StrobeDuty(moduleRow=self.controlPanel.moduleRow)
 
         self.addWidget(self.period.spinbox, 0, 1)
         self.addWidget(self.duty.spinbox, 0, 2)
@@ -46,6 +60,18 @@ class SetBiaParamCmd(CustomedCmd):
                                                 self.duty.getValue())
         return cmdStr
 
+
+class SetBiaPower(CustomedCmd):
+    def __init__(self, controlPanel):
+        CustomedCmd.__init__(self, controlPanel=controlPanel, buttonLabel='SET POWER')
+
+        self.power = BiaPower(moduleRow=self.controlPanel.moduleRow)
+
+        self.addWidget(self.power.spinbox, 0, 1)
+
+    def buildCmd(self):
+        cmdStr = '%s bia power=%i' % (self.controlPanel.actorName, self.power.getValue())
+        return cmdStr
 
 class SwitchBia(SwitchButton):
     def __init__(self, controlPanel):
@@ -71,8 +97,12 @@ class BiaPanel(ControllerPanel):
 
         self.bia = SwitchGB(self.moduleRow, 'bia', 'BIA', 0, '{:s}')
         self.biaStrobe = SwitchGB(self.moduleRow, 'biaConfig', 'Strobe', 0, '{:d}')
-        self.biaPeriod = ValueGB(self.moduleRow, 'biaConfig', 'Bia-Period', 1, '{:d}')
-        self.biaDuty = ValueGB(self.moduleRow, 'biaConfig', 'Bia-Duty', 2, '{:d}')
+        self.biaPower = ValueGB(self.moduleRow, 'biaStatus', 'LED Power(%)', 0, '{:d}')
+
+        self.biaPeriod = ValueGB(self.moduleRow, 'biaStatus', 'Period(ms)', 1, '{:d}')
+        self.biaDuty = ValueGB(self.moduleRow, 'biaStatus', 'Duty(%)', 2, '{:d}')
+        self.biaPulseOn = ValueGB(self.moduleRow, 'biaStatus', 'Pulse-On(ms)', 3, '{:d}')
+        self.biaPulseOff = ValueGB(self.moduleRow, 'biaStatus', 'Pulse-Off(ms)', 4, '{:d}')
 
         self.photores1 = ValueGB(self.moduleRow, 'photores', 'PhotoRes1', 0, '{:d}')
         self.photores2 = ValueGB(self.moduleRow, 'photores', 'PhotoRes2', 1, '{:d}')
@@ -84,9 +114,12 @@ class BiaPanel(ControllerPanel):
 
         self.grid.addWidget(self.bia, 1, 0)
         self.grid.addWidget(self.biaStrobe, 1, 1)
+        self.grid.addWidget(self.biaPower, 1, 2)
 
         self.grid.addWidget(self.biaPeriod, 2, 0)
         self.grid.addWidget(self.biaDuty, 2, 1)
+        self.grid.addWidget(self.biaPulseOn, 2, 2)
+        self.grid.addWidget(self.biaPulseOff, 2, 3)
 
         self.grid.addWidget(self.photores1, 3, 0)
         self.grid.addWidget(self.photores2, 3, 1)
@@ -98,8 +131,11 @@ class BiaCommands(EnuDeviceCmd):
         self.switchBia = SwitchBia(controlPanel=controlPanel)
         self.switchStrobe = SwitchButton(controlPanel=controlPanel, key='biaConfig', label='STROBE',
                                          cmdHead='%s bia strobe' % controlPanel.actorName)
-        self.setBiaParam = SetBiaParamCmd(controlPanel=controlPanel)
+
+        self.setBiaPower = SetBiaPower(controlPanel=controlPanel)
+        self.setStrobeParam = SetStrobeParamCmd(controlPanel=controlPanel)
 
         self.grid.addWidget(self.switchBia, 1, 0)
         self.grid.addWidget(self.switchStrobe, 1, 1)
-        self.grid.addLayout(self.setBiaParam, 2, 0, 1, 3)
+        self.grid.addLayout(self.setBiaPower, 2, 0, 1, 2)
+        self.grid.addLayout(self.setStrobeParam, 3, 0, 1, 3)
