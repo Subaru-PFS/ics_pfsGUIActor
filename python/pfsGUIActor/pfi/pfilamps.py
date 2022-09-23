@@ -1,27 +1,23 @@
 __author__ = 'alefur'
 
-import pfsGUIActor.styles as styles
-from pfsGUIActor.common import LineEdit
-from pfsGUIActor.control import ControlDialog
 from pfsGUIActor.control import ControlPanel, CommandsGB, ControlDialog
-from pfsGUIActor.enu import ConnectCmd
-from pfsGUIActor.modulerow import ModuleRow, RowWidget
-from pfsGUIActor.widgets import ValueMRow, SwitchMRow, Controllers, ValueGB, SwitchGB, CmdButton, ValuesRow
+from pfsGUIActor.modulerow import ModuleRow
+from pfsGUIActor.widgets import ValueMRow, ValueGB, SwitchGB, CmdButton, ValuesRow
 
 
 class PfiLampsRow(ModuleRow):
-    lampNames = [('Argon', 'Ar'), ('Krypton', 'Kr'), ('Neon', 'Ne'), ('Xenon', 'Xe'), ('Hg', 'Hg'), ('Cd', 'Cd'),
-                 ('Continuum', 'Cont')]
+    lampNames = ['Neon', 'Argon', 'Krypton', 'Xenon', 'HgCd', 'QTH']
 
     def __init__(self, pfiModule, name='pfilamps'):
         ModuleRow.__init__(self, module=pfiModule, actorName=name, actorLabel=name.upper())
 
-        self.lamps = [SwitchGB(self, f'{lamp}State', label, 0, '{:g}') for label, lamp in PfiLampsRow.lampNames]
+        # self.lamps = [SwitchGB(self, f'lampRequestMask', lamp, i, '{:g}') for i, lamp in enumerate(PfiLampsRow.lampNames)]
+        self.lampStatus = ValueMRow(self, 'lampStatus', 'lampStatus', 0, '{:s}')
         self.createDialog(PfiLampsDialog(self))
 
     @property
     def widgets(self):
-        return self.lamps
+        return [self.lampStatus]
 
 
 class PfiLampsDialog(ControlDialog):
@@ -37,7 +33,7 @@ class PfiLampsPanel(ControlPanel):
         self.addCommandSet(PfiLampsCommands(self))
 
     def createWidgets(self):
-        self.lamps = [LampState(self.moduleRow, lamp, label) for label, lamp in self.moduleRow.lampNames]
+        self.lamps = [LampState(self.moduleRow, i, lamp) for i, lamp in enumerate(self.moduleRow.lampNames)]
 
     def setInLayout(self):
         for i, lamp in enumerate(self.lamps):
@@ -45,11 +41,11 @@ class PfiLampsPanel(ControlPanel):
 
 
 class LampState(ValuesRow):
-    def __init__(self, moduleRow, lampKey, lampLabel):
-        widgets = [SwitchGB(moduleRow, f'{lampKey}State', '', 0, '{:d}'),
-                   ValueGB(moduleRow, f'{lampKey}State', 'Volts', 1, '{:g}')]
+    def __init__(self, moduleRow, ind, lamp):
+        widgets = [SwitchGB(moduleRow, f'lampRequestMask', '', ind, '{:g}'),
+                   ValueGB(moduleRow, f'lampRequestTimes', 'Seconds', ind, '{:d}')]
 
-        ValuesRow.__init__(self, widgets, title=lampLabel)
+        ValuesRow.__init__(self, widgets, title=lamp)
         self.grid.setContentsMargins(2, 8, 2, 2)
 
 
