@@ -7,10 +7,11 @@ from PyQt5.QtWidgets import QGroupBox
 from pfsGUIActor.cam import CamRow
 from pfsGUIActor.common import GridLayout
 from pfsGUIActor.enu import EnuRow
-from pfsGUIActor.rough import RoughRow
-from pfsGUIActor.sps import SpecModuleRow
 from pfsGUIActor.pfi.peb import PebRow
 from pfsGUIActor.pfi.pfilamps import PfiLampsRow
+from pfsGUIActor.rough import RoughRow
+from pfsGUIActor.sps import SpecModuleRow
+
 
 class Module(QGroupBox):
     def __init__(self, mwindow, title):
@@ -48,7 +49,7 @@ class Module(QGroupBox):
 class SpsAitModule(Module):
     def __init__(self, mwindow):
         Module.__init__(self, mwindow=mwindow, title='AIT')
-        actors = [actor.strip() for actor in mwindow.actor.config.get('ait', 'actors').split(',')]
+        actors = mwindow.actor.displayConfig['ait']
 
         self.dcbs = []
 
@@ -77,20 +78,27 @@ class SpsAitModule(Module):
 
 
 class SpecModule(Module):
-    def __init__(self, mwindow, smId, enu=True, arms=None):
+    def __init__(self, mwindow, smId, specConfig):
         Module.__init__(self, mwindow=mwindow, title='Spectrograph Module %i' % smId)
-        arms = ['b', 'r', 'n'] if arms is None else arms
-
         self.smId = smId
-        self.spec = [SpecModuleRow(self, smId), EnuRow(self)] if enu else []
-        self.cams = [CamRow(self, arm=arm) for arm in arms]
+        parts = []
+
+        for part in specConfig:
+            if part == 'enu':
+                parts.extend([SpecModuleRow(self, smId), EnuRow(self)])
+            elif part in ['b', 'r', 'n']:
+                parts.append(CamRow(self, arm=part))
+            else:
+                raise ValueError(f'unknown part:{part}')
+
+        self.parts = parts
 
         self.populateLayout()
         self.adjustSize()
 
     @property
     def rows(self):
-        return self.spec + self.cams
+        return self.parts
 
 
 class PfiModule(Module):

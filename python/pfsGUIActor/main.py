@@ -7,7 +7,7 @@ import sys
 
 from PyQt5.QtWidgets import QApplication, QMainWindow
 
-from mainwindow import SpsWidget
+from mainwindow import PfsWidget
 
 
 class PFSGUI(QMainWindow):
@@ -19,17 +19,17 @@ class PFSGUI(QMainWindow):
         self.setName("%s.%s" % ("pfsGUIActor", cmdrName))
         self.isConnected = False
         self.screenWidth = screen.width()
-        self.screenHeight= screen.height()
-        self.spsWidget = SpsWidget(self)
-        self.setCentralWidget(self.spsWidget)
+        self.screenHeight = screen.height()
+        self.pfsWidget = PfsWidget(self)
+        self.setCentralWidget(self.pfsWidget)
 
         self.show()
-        self.move(self.screenWidth*0.1, self.screenHeight*0.1)
+        self.move(self.screenWidth * 0.1, self.screenHeight * 0.1)
         self.setConnected(False)
 
     def setConnected(self, isConnected):
         self.isConnected = isConnected
-        self.spsWidget.setEnabled(isConnected)
+        self.pfsWidget.setEnabled(isConnected)
 
     def connectionMade(self):
         """ For overriding. """
@@ -40,7 +40,7 @@ class PFSGUI(QMainWindow):
         """ For overriding. """
         self.setConnected(False)
         if not self.actor.shuttingDown:
-            self.spsWidget.showError("Connection Lost", f"Connection to tron has failed : \n{reason}")
+            self.pfsWidget.showError("Connection Lost", f"Connection to tron has failed : \n{reason}")
 
     def setName(self, name):
         self.cmdrName = name
@@ -68,9 +68,10 @@ def main():
 
     import miniActor
 
-    specIds = [i + 1 for i in range(12)]
-    viscamNames = ['b%i' % i for i in specIds] + ['r%i' % i for i in specIds]
-    nircamNames = ['n%i' % i for i in specIds]
+    specIds = [i + 1 for i in range(4)]
+    specIdsWithJHU = specIds + [8, 9]
+    viscamNames = ['b%i' % i for i in specIdsWithJHU] + ['r%i' % i for i in specIdsWithJHU]
+    nircamNames = ['n%i' % i for i in specIdsWithJHU]
 
     xcus = ['xcu_%s' % cam for cam in viscamNames + nircamNames]
     ccds = ['ccd_%s' % cam for cam in viscamNames]
