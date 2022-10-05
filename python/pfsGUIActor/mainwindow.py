@@ -63,7 +63,7 @@ class TronStatus(ValueGB):
         self.setColor(*styles.colorWidget(key))
 
 
-class SpsWidget(QWidget):
+class PfsWidget(QWidget):
     def __init__(self, pfsGUI):
         QWidget.__init__(self)
         self.pfsGUI = pfsGUI
@@ -77,15 +77,14 @@ class SpsWidget(QWidget):
         nRow = 1
 
         for smId in range(1, 12):
-            if 'sm%d' % smId not in self.actor.config.sections():
+            if 'sm%d' % smId not in self.actor.displayConfig.keys():
                 continue
 
             nRow += 1
-            arms = [arm.strip() for arm in self.actor.config.get('sm%d' % smId, 'arms').split(',') if arm]
-            enu = self.actor.config.getboolean('sm%d' % smId, 'enu')
-            self.mainLayout.addWidget(SpecModule(self, smId=smId, enu=enu, arms=arms), nRow, 0)
+            specConfig = self.actor.displayConfig[f'sm{smId}']
+            self.mainLayout.addWidget(SpecModule(self, smId=smId, specConfig=specConfig), nRow, 0)
 
-        if 'pfi' in self.actor.config.sections():
+        if 'pfi' in self.actor.displayConfig.keys():
             self.mainLayout.addWidget(PfiModule(self), nRow + 1, 0)
 
         self.setLayout(self.mainLayout)

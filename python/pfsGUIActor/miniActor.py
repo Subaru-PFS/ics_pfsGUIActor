@@ -1,6 +1,7 @@
 import logging
 
 import actorcore.ICC
+from ics.utils.sps.spectroIds import getSite
 
 
 class OurActor(actorcore.ICC.ICC):
@@ -13,6 +14,8 @@ class OurActor(actorcore.ICC.ICC):
                                    configFile=configFile,
                                    modelNames=modelNames)
 
+        self.site = getSite()
+        self.displayConfig = self.actorConfig['display'][self.site]
         self.logger.setLevel(logLevel)
 
     def disconnectActor(self):
