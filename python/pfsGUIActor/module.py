@@ -1,7 +1,7 @@
 __author__ = 'alefur'
 
 import pfsGUIActor.dcb as dcb
-import pfsGUIActor.lam as lamAIT
+
 import pfsGUIActor.styles as styles
 from PyQt5.QtWidgets import QGroupBox
 from pfsGUIActor.cam import CamRow
@@ -11,6 +11,12 @@ from pfsGUIActor.pfi.peb import PebRow
 from pfsGUIActor.pfi.pfilamps import PfiLampsRow
 from pfsGUIActor.rough import RoughRow
 from pfsGUIActor.sps import SpecModuleRow
+
+# lam import
+
+import pfsGUIActor.lam.aten as lamAten
+import pfsGUIActor.lam.sac as lamSac
+import pfsGUIActor.lam.breva as lamBreva
 
 
 class Module(QGroupBox):
@@ -58,9 +64,10 @@ class SpsAitModule(Module):
         if 'dcb2' in actors:
             self.dcbs += dcb.DcbRow(self, 'dcb2').rows
 
-        lamAITRows = [lamAIT.aten.AtenRow(self).rows] if 'aten' in actors else []
-        lamAITRows += [lamAIT.sac.SacRow(self)] if 'sac' in actors else []
-        lamAITRows += [lamAIT.breva.BrevaRow(self)] if 'breva' in actors else []
+        lamAITRows = []
+        lamAITRows += lamAten.AtenRow(self).rows if 'aten' in actors else []
+        lamAITRows += [lamSac.SacRow(self)] if 'sac' in actors else []
+        lamAITRows += [lamBreva.BrevaRow(self)] if 'breva' in actors else []
 
         self.lamAITRows = lamAITRows
 
