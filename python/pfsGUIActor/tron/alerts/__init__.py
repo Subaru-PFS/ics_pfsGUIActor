@@ -124,7 +124,7 @@ class AlertPanel(ControllerPanel):
 
 class AlertsDialog(ControlDialog):
     def __init__(self, alertsRow):
-        ControlDialog.__init__(self, moduleRow=alertsRow)
+        ControlDialog.__init__(self, moduleRow=alertsRow, title='ALERTS')
 
         stsConfig = configIO.loadConfig('STS', subDirectory='alerts')['actors']
         alertsConfig = configIO.loadConfig('alerts', subDirectory='actors')['alerts'][
