@@ -1,5 +1,6 @@
 __author__ = 'alefur'
 
+from PyQt5.QtWidgets import QSpacerItem, QSizePolicy
 from PyQt5.QtWidgets import QWidget, QMessageBox
 from pfsGUIActor.common import GridLayout
 from pfsGUIActor.module import SpsAitModule, SpecModule, PfiModule
@@ -10,14 +11,20 @@ class PfsWidget(QWidget):
     def __init__(self, pfsGUI):
         QWidget.__init__(self)
         self.pfsGUI = pfsGUI
-        self.tronModule = TronModule(self)
+
         self.mainLayout = GridLayout()
         self.mainLayout.setSpacing(1)
         self.mainLayout.setContentsMargins(0, 0, 0, 0)
 
-        self.mainLayout.addWidget(self.tronModule, 0, 0)
-        self.mainLayout.addWidget(SpsAitModule(self), 1, 0)
-        nRow = 1
+        nCol = 4
+        # add spacer
+        self.mainLayout.addItem(QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.MinimumExpanding), 1, nCol - 1)
+
+        self.tronModule = TronModule(self)
+        self.mainLayout.addWidget(self.tronModule, 1, nCol - 1, 1, 1)
+
+        nRow = 2
+        self.mainLayout.addWidget(SpsAitModule(self), nRow, 0, 1, nCol)
 
         for smId in range(1, 12):
             if 'sm%d' % smId not in self.actor.displayConfig.keys():
@@ -25,10 +32,10 @@ class PfsWidget(QWidget):
 
             nRow += 1
             specConfig = self.actor.displayConfig[f'sm{smId}']
-            self.mainLayout.addWidget(SpecModule(self, smId=smId, specConfig=specConfig), nRow, 0)
+            self.mainLayout.addWidget(SpecModule(self, smId=smId, specConfig=specConfig), nRow, 0, 1, nCol)
 
         if 'pfi' in self.actor.displayConfig.keys():
-            self.mainLayout.addWidget(PfiModule(self), nRow + 1, 0)
+            self.mainLayout.addWidget(PfiModule(self), nRow + 1, 0, 1, nCol)
 
         self.setLayout(self.mainLayout)
 
@@ -58,4 +65,6 @@ class PfsWidget(QWidget):
         widgets = [self.mainLayout.itemAt(i).widget() for i in range(self.mainLayout.count())]
 
         for widget in widgets:
+            if widget is None:
+                continue
             widget.setEnabled(a0)

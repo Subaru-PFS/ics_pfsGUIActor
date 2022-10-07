@@ -1,6 +1,7 @@
 __author__ = 'alefur'
 
 import pfs.instdata.io as configIO
+from PyQt5.QtWidgets import QSpacerItem, QSizePolicy
 from pfsGUIActor.control import ControlDialog
 from pfsGUIActor.control import ControllerPanel
 from pfsGUIActor.modulerow import ModuleRow
@@ -105,6 +106,11 @@ class AlertPanel(ControllerPanel):
                 self.grid.addWidget(alert.status, rowId, 4)
 
                 self.alerts.append(alert)
+
+    def setInLayout(self):
+        """Set spacer"""
+        self.spacer = QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.MinimumExpanding)
+        self.grid.addItem(self.spacer, self.grid.rowCount(), 0)
 
     def updateStatusIcon(self, a0):
         if not a0:

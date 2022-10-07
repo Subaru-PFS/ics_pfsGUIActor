@@ -167,7 +167,6 @@ class ControlPanel(QWidget):
 
     def updateStatusIcon(self, a0: bool):
         color = 'green' if a0 else 'gray'
-        print(color)
         self.updateIcon(color)
 
     def setEnabled(self, a0: bool):
