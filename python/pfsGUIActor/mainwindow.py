@@ -1,80 +1,30 @@
 __author__ = 'alefur'
 
-import pfsGUIActor.styles as styles
-from PyQt5.QtWidgets import QWidget, QMessageBox, QGroupBox, QLabel, QDial
-from pfsGUIActor.common import GridLayout, HBoxLayout
+from PyQt5.QtWidgets import QSpacerItem, QSizePolicy
+from PyQt5.QtWidgets import QWidget, QMessageBox
+from pfsGUIActor.common import GridLayout
 from pfsGUIActor.module import SpsAitModule, SpecModule, PfiModule
-from pfsGUIActor.widgets import ValueGB
-
-
-class TronDial(QDial):
-    style = ''' QDial{background-color:QLinearGradient(x1: 0.177, y1: 0.004, x2: 0.831, y2: 0.911,  stop: 0 white,
-    stop: 0.061 white, stop: 0.066 lightgray, stop: 0.5 #242424, stop: 0.505 #000000,stop: 0.827 #040404,
-    stop: 0.966 #292929,stop: 0.983 #2e2e2e); }'''
-
-    def __init__(self):
-        QDial.__init__(self)
-        self.setMinimum(0)
-        self.setMaximum(10)
-        self.setValue(0)
-        self.setMaximumSize(30, 30)
-        self.setWrapping(True)  # Smooth transition from 99 to 0
-        self.setNotchesVisible(True)
-        self.setStyleSheet(self.style)
-
-    def heartBeat(self):
-        value = self.value() + 1
-        value = 0 if value > self.maximum() else value
-        self.setValue(value)
-
-
-class TronLayout(HBoxLayout):
-    def __init__(self):
-        HBoxLayout.__init__(self)
-        self.addStretch()
-        self.tronStatus = TronStatus()
-        self.addWidget(self.tronStatus)
-
-    def widget(self):
-        return self.tronStatus
-
-
-class TronStatus(ValueGB):
-    def __init__(self, fontSize=styles.smallFont):
-        self.fontSize = fontSize
-
-        QGroupBox.__init__(self)
-        self.setTitle('TRON')
-
-        self.grid = GridLayout()
-        self.grid.setContentsMargins(5, 0, 0, 0)
-
-        self.value = QLabel()
-        self.dial = TronDial()
-
-        self.grid.addWidget(self.value, 0, 0)
-        self.grid.addWidget(self.dial, 0, 1)
-        self.setLayout(self.grid)
-
-    def setEnabled(self, isOnline):
-        text = 'ONLINE' if isOnline else 'OFFLINE'
-        key = text if isOnline else 'failed'
-        self.value.setText(text)
-        self.setColor(*styles.colorWidget(key))
+from pfsGUIActor.tron.module import TronModule
 
 
 class PfsWidget(QWidget):
     def __init__(self, pfsGUI):
         QWidget.__init__(self)
         self.pfsGUI = pfsGUI
-        self.tronLayout = TronLayout()
+
         self.mainLayout = GridLayout()
         self.mainLayout.setSpacing(1)
         self.mainLayout.setContentsMargins(0, 0, 0, 0)
 
-        self.mainLayout.addLayout(self.tronLayout, 0, 0)
-        self.mainLayout.addWidget(SpsAitModule(self), 1, 0)
-        nRow = 1
+        nCol = 4
+        # add spacer
+        self.mainLayout.addItem(QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.MinimumExpanding), 1, nCol - 1)
+
+        self.tronModule = TronModule(self)
+        self.mainLayout.addWidget(self.tronModule, 1, nCol - 1, 1, 1)
+
+        nRow = 2
+        self.mainLayout.addWidget(SpsAitModule(self), nRow, 0, 1, nCol)
 
         for smId in range(1, 12):
             if 'sm%d' % smId not in self.actor.displayConfig.keys():
@@ -82,10 +32,10 @@ class PfsWidget(QWidget):
 
             nRow += 1
             specConfig = self.actor.displayConfig[f'sm{smId}']
-            self.mainLayout.addWidget(SpecModule(self, smId=smId, specConfig=specConfig), nRow, 0)
+            self.mainLayout.addWidget(SpecModule(self, smId=smId, specConfig=specConfig), nRow, 0, 1, nCol)
 
         if 'pfi' in self.actor.displayConfig.keys():
-            self.mainLayout.addWidget(PfiModule(self), nRow + 1, 0)
+            self.mainLayout.addWidget(PfiModule(self), nRow + 1, 0, 1, nCol)
 
         self.setLayout(self.mainLayout)
 
@@ -106,7 +56,7 @@ class PfsWidget(QWidget):
                                       callCodes=keyvar.AllCodes))
 
     def heartBeat(self):
-        self.tronLayout.tronStatus.dial.heartBeat()
+        self.tronModule.tronStatus.dial.heartBeat()
 
     def showError(self, title, error):
         reply = QMessageBox.critical(self, title, error, QMessageBox.Ok)
@@ -115,4 +65,6 @@ class PfsWidget(QWidget):
         widgets = [self.mainLayout.itemAt(i).widget() for i in range(self.mainLayout.count())]
 
         for widget in widgets:
+            if widget is None:
+                continue
             widget.setEnabled(a0)

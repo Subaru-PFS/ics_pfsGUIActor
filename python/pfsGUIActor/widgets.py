@@ -51,7 +51,8 @@ class ValueGB(QGroupBox):
         bckColor = 'qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0  %s, stop: 1 %s)' % (col1, col2)
         fontSize = max(8, round(0.85 * self.fontSize))
         self.setStyleSheet(
-            "QGroupBox {font-size: %ipt; background-color: %s ;border: 1px solid gray;border-radius: 3px;margin-top: 1ex;} "%(fontSize, bckColor)+
+            "QGroupBox {font-size: %ipt; background-color: %s ;border: 1px solid gray;"
+            "border-radius: 3px;margin-top: 1ex;} " % (fontSize, bckColor) +
             "QGroupBox::title {subcontrol-origin: margin;subcontrol-position: top center; padding: 0 0px;}")
         return bckColor
 
@@ -81,6 +82,31 @@ class ValueGB(QGroupBox):
     def setEnabled(self, isOnline):
         if not isOnline:
             self.setColor(*styles.colorWidget('offline'))
+
+
+class StaticValueGB(ValueGB):
+    def __init__(self, moduleRow, title, staticValue, fontSize=styles.smallFont):
+        self.moduleRow = moduleRow
+        self.title = title
+        self.fontSize = fontSize
+
+        QGroupBox.__init__(self)
+        self.setTitle('%s' % self.title)
+
+        self.grid = GridLayout()
+        self.grid.setContentsMargins(*[2, 4, 2, 4])
+        self.value = QLabel(staticValue)
+        self.grid.addWidget(self.value, 0, 0)
+        self.setLayout(self.grid)
+
+    def setEnabled(self, isOnline):
+        if not isOnline:
+            self.setColor(*styles.colorWidget('offline'))
+        else:
+            self.setColor(background='white', police='black')
+
+    def __del__(self):
+        pass
 
 
 class ValuesRow(QGroupBox):

@@ -9,7 +9,7 @@ import pfsGUIActor.styles as styles
 from PyQt5.QtGui import QPixmap, QIcon, QPainter
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtWidgets import QPushButton, QDoubleSpinBox, QSpinBox, QComboBox, QCheckBox, QLineEdit, QGridLayout, \
-    QVBoxLayout, QHBoxLayout, QTabWidget
+    QVBoxLayout, QHBoxLayout, QTabWidget, QLabel
 
 spacing = 2
 
@@ -74,6 +74,10 @@ class LineEdit(QLineEdit):
         QLineEdit.__init__(self, *args, **kwargs)
         self.setStyleSheet("QLineEdit {font: %dpt; }" % (styles.smallFont))
 
+class Label(QLabel):
+    def __init__(self, *args, **kwargs):
+        QLabel.__init__(self, *args, **kwargs)
+        self.setStyleSheet("QLabel {font: %dpt; }" % (styles.smallFont))
 
 class CheckBox(QCheckBox):
     def __init__(self, *args, **kwargs):

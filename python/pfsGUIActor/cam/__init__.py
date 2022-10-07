@@ -40,8 +40,8 @@ class CamDevice(QGroupBox):
     def addCommandSet(self, commands):
         ControlPanel.addCommandSet(self, commands)
 
-    def updateIcon(self, a0):
-        filename = 'green.png' if a0 else 'orange.png'
+    def updateStatusIcon(self, a0):
+        filename = 'green.png' if a0 else 'gray.png'
         self.setStyleSheet(
             "CamDevice {font-size: %dpt; font-weight:bold;border: 1px solid #000000;border-radius: 20;;margin-top: 10px;}"
             "CamDevice::title {subcontrol-origin: margin;subcontrol-position: top left; padding: 0 10px;}"
