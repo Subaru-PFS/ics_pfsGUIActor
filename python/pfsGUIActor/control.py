@@ -88,7 +88,7 @@ class ControlDialog(QDialog):
         self.setLayout(self.vbox)
         self.setWindowTitle(title)
         self.setVisible(False)
-        self.move(self.moduleRow.mwindow.pfsGUI.screenWidth*0.3, self.moduleRow.mwindow.pfsGUI.screenHeight*0.5)
+        self.move(self.moduleRow.mwindow.pfsGUI.screenWidth * 0.3, self.moduleRow.mwindow.pfsGUI.screenHeight * 0.5)
 
     def rawLogArea(self):
         return RawLogArea(self.moduleRow.actorName)
@@ -120,7 +120,6 @@ class ControlDialog(QDialog):
 
     def close(self):
         self.hide()
-       # self.setVisible(False)
 
     def setEnabled(self, a0: bool):
         for widget in [self.topbar] + self.pannels:
@@ -161,13 +160,19 @@ class ControlPanel(QWidget):
         self.spacer = QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.MinimumExpanding)
         self.grid.addItem(self.spacer, self.grid.rowCount(), 0)
 
-    def updateIcon(self, a0):
-        icon = Icon('green.png') if a0 else Icon('orange.png')
+    def updateIcon(self, color):
+        icon = Icon(f'{color}.png')
         self.controlDialog.tabWidget.setTabIcon(self.controlDialog.tabWidget.indexOf(self), icon)
         self.controlDialog.tabWidget.setIconSize(QSize(styles.bigFont + 2, styles.bigFont + 2))
 
+    def updateStatusIcon(self, a0: bool):
+        color = 'green' if a0 else 'gray'
+        print(color)
+        self.updateIcon(color)
+
     def setEnabled(self, a0: bool):
-        self.updateIcon(a0)
+        self.updateStatusIcon(a0)
+
         for item in [self.grid.itemAt(i) for i in range(self.grid.count())]:
             if issubclass(type(item), QSpacerItem):
                 continue
@@ -201,8 +206,8 @@ class CommandsGB(QGroupBox):
 
 class ControllerPanel(ControlPanel):
     def __init__(self, controlDialog, controllerName):
-        ControlPanel.__init__(self, controlDialog=controlDialog)
         self.controllerName = controllerName
+        ControlPanel.__init__(self, controlDialog=controlDialog)
 
     def setEnabled(self, a0):
         a0 = self.controllerName in self.moduleRow.keyVarDict['controllers'] if a0 else False
