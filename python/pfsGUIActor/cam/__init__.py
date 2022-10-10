@@ -8,7 +8,8 @@ from pfsGUIActor.common import PushButton, imgPath, VBoxLayout, GridLayout, TabW
 from pfsGUIActor.control import ControlDialog, ButtonBox, ControlPanel, ControllerPanel
 from pfsGUIActor.logs import CmdLogArea
 from pfsGUIActor.modulerow import ActorGB, ModuleRow
-from pfsGUIActor.widgets import  ValueGB
+from pfsGUIActor.widgets import ValueGB
+
 
 class CamDevice(QGroupBox):
     def __init__(self, controlDialog, controllerName, title=None):
@@ -46,10 +47,12 @@ class CamDevice(QGroupBox):
             "CamDevice {font-size: %dpt; font-weight:bold;border: 1px solid #000000;border-radius: 20;;margin-top: 10px;}"
             "CamDevice::title {subcontrol-origin: margin;subcontrol-position: top left; padding: 0 10px;}"
             "CamDevice::indicator { width:%ipx; height: %ipx;}"
-            "CamDevice::indicator:checked {image: url(%s);} " % (styles.smallFont, styles.bigFont + 2, styles.bigFont + 2, os.path.join(imgPath, filename)))
+            "CamDevice::indicator:checked {image: url(%s);} " % (
+            styles.smallFont, styles.bigFont + 2, styles.bigFont + 2, os.path.join(imgPath, filename)))
 
     def setEnabled(self, a0):
         ControllerPanel.setEnabled(self, a0)
+
 
 class ExposureState(ValueGB):
     def __init__(self, moduleRow):
@@ -59,6 +62,7 @@ class ExposureState(ValueGB):
     def setText(self, txt):
         txt = txt.upper()
         ValueGB.setText(self, txt)
+
 
 from pfsGUIActor.cam.ccd import CcdRow
 from pfsGUIActor.cam.hx import HxRow
@@ -108,7 +112,11 @@ class CamRow(ModuleRow):
 
     @property
     def displayed(self):
-        return [self.actorStatus, self.xcu.cryoMode, self.detector.substate, self.xcu.temperature, self.xcu.pressure, self.xcu.twoIonPumps]
+        return [self.actorStatus, self.xcu.cryoMode, self.detector.substate, self.xcu.temperature, self.xcu.pressure,  self.xcu.twoIonPumps]
+
+    @property
+    def isNir(self):
+        return self.arm == 'n'
 
     def setOnline(self, isOnline=None):
         status = sum([self.detector.isOnline + self.xcu.isOnline]) if isOnline is None else int(isOnline)

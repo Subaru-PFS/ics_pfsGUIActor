@@ -194,4 +194,4 @@ class XcuDialog(ControlDialog):
 
     @property
     def isNir(self):
-        return self.moduleRow.camRow.arm == 'n'
+        return self.moduleRow.camRow.isNir

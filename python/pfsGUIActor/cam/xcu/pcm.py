@@ -1,4 +1,5 @@
 __author__ = 'alefur'
+
 from pfsGUIActor.common import LineEdit, ComboBox
 from pfsGUIActor.control import ControllerPanel, ControllerCmd
 from pfsGUIActor.widgets import ValueGB, SwitchGB, ValuesRow, SwitchButton, CustomedCmd, CmdButton
@@ -22,10 +23,19 @@ class PcmPort(ValuesRow):
     def __init__(self, moduleRow, powerName, pcmPort):
         self.powerName = powerName
         self.pcmPort = pcmPort
-        widgets = [SwitchGB(moduleRow, pcmPort, 'state', 1, '{:s}'),
-                   ValueGB(moduleRow, pcmPort, 'volts', 2, '{:.3f}'),
-                   ValueGB(moduleRow, pcmPort, 'amps', 3, '{:.3f}'),
-                   ValueGB(moduleRow, pcmPort, 'watts', 4, '{:.3f}')]
+
+        if moduleRow.camRow.isNir and powerName == 'fee':
+            powerName = 'sam'
+            switch = SwitchGB(moduleRow, "sampower", 'state', 0, '{:s}')
+            switch.controllerName = 'gatevalve'
+            widgets = [switch]
+        else:
+            widgets = [SwitchGB(moduleRow, pcmPort, 'state', 1, '{:s}'),
+                       ValueGB(moduleRow, pcmPort, 'volts', 2, '{:.3f}'),
+                       ValueGB(moduleRow, pcmPort, 'amps', 3, '{:.3f}'),
+                       ValueGB(moduleRow, pcmPort, 'watts', 4, '{:.3f}')]
+
+        self.nCols = len(widgets)
 
         ValuesRow.__init__(self, widgets, title=f'{powerName.capitalize()}')
 
@@ -37,6 +47,7 @@ class PcmPower(ValuesRow):
 
         ValuesRow.__init__(self, widgets, title='Inputs')
 
+
 class PcmPanel(ControllerPanel):
     ports = dict(motors=1, gauge=2, cooler=3, temps=4, bee=5, fee=6, interlock=7, heaters=8)
 
@@ -45,13 +56,13 @@ class PcmPanel(ControllerPanel):
         self.addCommandSet(PcmCommands(self))
 
     def createWidgets(self):
-        self.pcpPower = PcmPower(self.moduleRow)
+        self.pcmPower = PcmPower(self.moduleRow)
         self.pcmPorts = [PcmPort(self.moduleRow, name, f'pcmPort{portNb}') for name, portNb in self.ports.items()]
 
     def setInLayout(self):
-        self.grid.addWidget(self.pcpPower, 0, 0, 1, 2)
+        self.grid.addWidget(self.pcmPower, 0, 0, 1, 2)
         for i, pcmPort in enumerate(self.pcmPorts):
-            self.grid.addWidget(pcmPort, i + 1, 0, 1, 4)
+            self.grid.addWidget(pcmPort, i + 1, 0, 1, pcmPort.nCols)
 
 
 class RawCmd(CustomedCmd):
@@ -138,4 +149,15 @@ class PcmCommands(ControllerCmd):
         self.grid.addLayout(self.getThresh, 3, 0, 1, 2)
 
         for i, pcmPort in enumerate(controlPanel.pcmPorts):
-            self.grid.addWidget(PcmButton(controlPanel, pcmPort), 4 + i, 0, 1, 2)
+            # means sam power
+            if pcmPort.nCols == 1:
+                button = SwitchButton(controlPanel, 'sampower',
+                                      label='Sam', ind=1, fmt='{:s}', cmdHead='',
+                                      cmdStrOn=f'{controlPanel.actorName} sam on',
+                                      cmdStrOff=f'{controlPanel.actorName} sam off',
+                                      safetyCheck=True)
+                button.controllerName = 'gatevalve'
+            else:
+                button = PcmButton(controlPanel, pcmPort)
+
+            self.grid.addWidget(button, 4 + i, 0, 1, 2)
