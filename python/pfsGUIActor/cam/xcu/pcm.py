@@ -26,7 +26,7 @@ class PcmPort(ValuesRow):
 
         if moduleRow.camRow.isNir and powerName == 'fee':
             powerName = 'sam'
-            switch = SwitchGB(moduleRow, "sampower", 'state', 0, '{:s}')
+            switch = SwitchGB(moduleRow, "sampower", 'state', 0, '{:g}')
             switch.controllerName = 'gatevalve'
             widgets = [switch]
         else:
@@ -152,7 +152,7 @@ class PcmCommands(ControllerCmd):
             # means sam power
             if pcmPort.nCols == 1:
                 button = SwitchButton(controlPanel, 'sampower',
-                                      label='Sam', ind=1, fmt='{:s}', cmdHead='',
+                                      label='Sam', ind=0, fmt='{:g}', cmdHead='',
                                       cmdStrOn=f'{controlPanel.actorName} sam on',
                                       cmdStrOff=f'{controlPanel.actorName} sam off',
                                       safetyCheck=True)
