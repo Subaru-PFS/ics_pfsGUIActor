@@ -2,10 +2,65 @@ __author__ = 'alefur'
 
 import pfs.instdata.io as configIO
 from PyQt5.QtWidgets import QSpacerItem, QSizePolicy
-from pfsGUIActor.control import ControlDialog
-from pfsGUIActor.control import ControllerPanel
+from pfsGUIActor.common import ComboBox, GridLayout
+from pfsGUIActor.control import ControlDialog, ControllerPanel
 from pfsGUIActor.modulerow import ModuleRow
-from pfsGUIActor.widgets import Controllers, ValueMRow, StaticValueGB, ValueGB
+from pfsGUIActor.widgets import StaticValueGB, ValueGB, CmdButton, ValueMRow, Controllers, \
+    CustomedCmd
+
+
+class ConnectButton(CmdButton):
+    def __init__(self, upperCmd, label):
+        self.upperCmd = upperCmd
+        CmdButton.__init__(self, controlPanel=None, controlDialog=upperCmd.controlDialog, label=label)
+
+    def buildCmd(self):
+        return self.upperCmd.buildCmd()
+
+
+class ConnectCmd(CustomedCmd):
+    def __init__(self, controlDialog, controllers):
+        GridLayout.__init__(self)
+        self.keyvar = controlDialog.moduleRow.keyVarDict['controllers']
+        self.keyvar.addCallback(self.setButtonLabel, callNow=False)
+        self.controlDialog = controlDialog
+        self.button = ConnectButton(self, label='CONNECT')
+
+        self.combo = ComboBox()
+        self.combo.addItems(controllers)
+        self.combo.currentTextChanged.connect(self.setButtonLabel)
+
+        self.addWidget(self.button, 0, 0)
+        self.addWidget(self.combo, 0, 1)
+
+    def setButtonLabel(self, keyvar):
+        keyvar = self.keyvar if isinstance(keyvar, str) else keyvar
+        controllers = keyvar.getValue(doRaise=False)
+        label = 'DISCONNECT' if self.combo.currentText() in controllers else 'CONNECT'
+        self.button.setText(label)
+
+    def buildCmd(self):
+
+        controller = self.combo.currentText()
+
+        # Should have normalized rough actor names to rough_N.
+        if '_' in controller:
+            name = controller
+            model = name.split('_')[0]
+        elif controller[-1].isdigit() and controller != 'gen2':
+            name = controller
+            model = controller[:-1]
+        else:
+            name = model = controller
+
+        doConnect = self.button.text().lower() == 'connect'
+
+        if doConnect:
+            cmdStr = f'alerts connect controller={model} name={name}'
+        else:
+            cmdStr = f'alerts disconnect controller={name}'
+
+        return cmdStr
 
 
 class AlertsRow(ModuleRow):
@@ -128,9 +183,14 @@ class AlertsDialog(ControlDialog):
 
         stsConfig, alertsActorConfig = self.loadAlertsConfig()
 
-        for part in alertsActorConfig['parts']:
-            # hackity hack.
-            actorName = f'xcu_{part}' if part not in stsConfig.keys() else part
+        # hackity hack.
+        actorNames = [f'xcu_{part}' if part not in stsConfig.keys() else part for part in alertsActorConfig['parts']]
+
+        # add connect button
+        self.connectCmd = ConnectCmd(self, actorNames)
+        self.topbar.addLayout(self.connectCmd)
+
+        for actorName in actorNames:
             alertPannel = AlertPanel(self, actorName, stsConfig[actorName])
             self.tabWidget.addTab(alertPannel, actorName)
 
@@ -144,7 +204,7 @@ class AlertsDialog(ControlDialog):
         alertsActorConfig = configIO.loadConfig('alerts', subDirectory='actors')['alerts'][self.site]
 
         # extending STS config with optional local configuration.
-        if 'extendSTS' in self.alertsActorConfig:
+        if 'extendSTS' in alertsActorConfig:
             moreCfg = configIO.loadConfig(alertsActorConfig['extendSTS'], subDirectory='alerts')
             stsConfig.update(moreCfg['actors'])
 
