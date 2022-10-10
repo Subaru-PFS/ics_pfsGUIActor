@@ -126,12 +126,26 @@ class AlertsDialog(ControlDialog):
     def __init__(self, alertsRow):
         ControlDialog.__init__(self, moduleRow=alertsRow, title='ALERTS')
 
-        stsConfig = configIO.loadConfig('STS', subDirectory='alerts')['actors']
-        alertsConfig = configIO.loadConfig('alerts', subDirectory='actors')['alerts'][
-            self.moduleRow.module.mwindow.actor.site]
+        stsConfig, alertsActorConfig = self.loadAlertsConfig()
 
-        for part in alertsConfig['parts']:
+        for part in alertsActorConfig['parts']:
             # hackity hack.
             actorName = f'xcu_{part}' if part not in stsConfig.keys() else part
             alertPannel = AlertPanel(self, actorName, stsConfig[actorName])
             self.tabWidget.addTab(alertPannel, actorName)
+
+    @property
+    def site(self):
+        return self.moduleRow.module.mwindow.actor.site
+
+    def loadAlertsConfig(self):
+
+        stsConfig = configIO.loadConfig('STS', subDirectory='alerts')['actors']
+        alertsActorConfig = configIO.loadConfig('alerts', subDirectory='actors')['alerts'][self.site]
+
+        # extending STS config with optional local configuration.
+        if 'extendSTS' in self.alertsActorConfig:
+            moreCfg = configIO.loadConfig(alertsActorConfig['extendSTS'], subDirectory='alerts')
+            stsConfig.update(moreCfg['actors'])
+
+        return stsConfig, alertsActorConfig
