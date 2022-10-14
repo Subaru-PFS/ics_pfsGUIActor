@@ -1,5 +1,6 @@
 __author__ = 'alefur'
 
+from pfsGUIActor.cam.hx.panel import HxPanel
 from pfsGUIActor.control import ControlDialog, Topbar
 from pfsGUIActor.modulerow import ModuleRow
 from pfsGUIActor.widgets import Controllers, ValueMRow
@@ -45,10 +46,14 @@ class HxDialog(ControlDialog):
         self.topbar = Topbar(self)
         self.topbar.insertWidget(0, self.moduleRow.actorStatus)
 
+        self.hxPanel = HxPanel(self)
+        self.tabWidget.addTab(self.hxPanel, 'hx')
+
     @property
     def cmdBuffer(self):
         return self.moduleRow.camRow.controlDialog.cmdBuffer
 
     @property
     def pannels(self):
-        return []
+        return [self.hxPanel]
+
