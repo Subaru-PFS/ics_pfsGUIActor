@@ -1,6 +1,6 @@
 __author__ = 'alefur'
 
-import pfs.instdata.io as configIO
+import ics_utils.instdata.io as instdataIO
 from PyQt5.QtWidgets import QSpacerItem, QSizePolicy
 from pfsGUIActor.common import ComboBox, GridLayout
 from pfsGUIActor.control import ControlDialog, ControllerPanel
@@ -200,12 +200,12 @@ class AlertsDialog(ControlDialog):
 
     def loadAlertsConfig(self):
 
-        stsConfig = configIO.loadConfig('STS', subDirectory='alerts')['actors']
-        alertsActorConfig = configIO.loadConfig('alerts', subDirectory='actors')['alerts'][self.site]
+        stsConfig = instdataIO.loadConfig('STS', subDirectory='alerts')['actors']
+        alertsActorConfig = instdataIO.loadConfig('alerts', subDirectory='actors')['alerts'][self.site]
 
         # extending STS config with optional local configuration.
         if 'extendSTS' in alertsActorConfig:
-            moreCfg = configIO.loadConfig(alertsActorConfig['extendSTS'], subDirectory='alerts')
+            moreCfg = instdataIO.loadConfig(alertsActorConfig['extendSTS'], subDirectory='alerts')
             stsConfig.update(moreCfg['actors'])
 
         return stsConfig, alertsActorConfig
