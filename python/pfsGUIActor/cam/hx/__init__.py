@@ -33,6 +33,7 @@ class RampProgress(QProgressBar):
         try:
             nramp, ngroup, nreset, nread, ndrop = keyvar.getValue()
         except ValueError:
+            self.doShow(False)
             return
 
         self.doShow(True)

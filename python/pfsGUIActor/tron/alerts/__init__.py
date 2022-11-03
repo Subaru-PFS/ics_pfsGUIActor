@@ -1,6 +1,6 @@
 __author__ = 'alefur'
 
-import ics_utils.instdata.io as instdataIO
+import ics.utils.instdata.io as instdataIO
 from PyQt5.QtWidgets import QSpacerItem, QSizePolicy
 from pfsGUIActor.common import ComboBox, GridLayout
 from pfsGUIActor.control import ControlDialog, ControllerPanel
