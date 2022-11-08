@@ -31,7 +31,7 @@ class PduPort(ValuesRow):
 
 
 class PduPanel(ControllerPanel):
-    ports = dict(slit=3, ctrl=4, pows=5, iis=6)
+    ports = dict(slit=3, ctrl=4, pows=5, iis=6, temps=8)
 
     def __init__(self, controlDialog):
         ControllerPanel.__init__(self, controlDialog, 'pdu')
