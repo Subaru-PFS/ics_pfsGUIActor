@@ -1,15 +1,13 @@
 __author__ = 'alefur'
 
-from pfsGUIActor.common import ComboBox
 from pfsGUIActor.control import ControllerPanel, ControllerCmd
-from pfsGUIActor.enu import EnuDeviceCmd
-from pfsGUIActor.widgets import ValueGB, CustomedCmd, CmdButton, ValuesRow
+from pfsGUIActor.widgets import ValueGB
 
 
 class LeakageBox(ValueGB):
     def setText(self, txt):
         try:
-            txt = 'ALARM' if not int(txt) else 'OK'
+            txt = 'ALARM' if int(txt) else 'OK'
         except ValueError:
             pass
         ValueGB.setText(self, txt)
