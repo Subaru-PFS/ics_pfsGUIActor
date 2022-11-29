@@ -1,7 +1,7 @@
 import numpy as np
 
-bigFont = 10
-smallFont = 8
+bigFont = 8
+smallFont = 7
 
 
 def colorHtml(r, g, b):

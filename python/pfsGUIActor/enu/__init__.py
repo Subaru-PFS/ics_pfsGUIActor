@@ -33,6 +33,7 @@ from pfsGUIActor.enu.temps import TempsPanel
 from pfsGUIActor.modulerow import ModuleRow
 from pfsGUIActor.widgets import CmdButton, ValueMRow, Controllers, CustomedCmd
 from pfsGUIActor.common import ComboBox, GridLayout
+import pfsGUIActor.styles as styles
 
 
 class ElapsedTime(QProgressBar):
@@ -41,9 +42,9 @@ class ElapsedTime(QProgressBar):
         self.enuRow = enuRow
         self.enuRow.keyVarDict['elapsedTime'].addCallback(self.updateBar, callNow=False)
         self.enuRow.keyVarDict['integratingTime'].addCallback(self.setExptime, callNow=False)
-        self.setStyleSheet("QProgressBar {background-color: rgba(0, 0, 0, 0);color:white;text-align: center; }")
+        self.setStyleSheet("QProgressBar {font-size: %ipt; background-color: rgba(0, 0, 0, 0);"
+                           "color:white;text-align: center; }" % styles.bigFont)
         self.setFormat('EXPOSING \r\n' + '%v / %m secs')
-
 
     def setExptime(self, keyvar):
         try:

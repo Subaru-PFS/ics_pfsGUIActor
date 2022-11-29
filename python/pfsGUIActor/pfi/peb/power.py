@@ -33,7 +33,7 @@ class PebSwitchIdentifier(object):
 
 class AGCIdentifier(PebSwitchIdentifier):
     def __init__(self, agcId):
-        PebSwitchIdentifier.__init__(self, f'AGC {agcId}', agcId - 1, f'agc id={agcId}')
+        PebSwitchIdentifier.__init__(self, f'AGC {agcId}', agcId - 1, f'agc ids={agcId}')
 
 
 class PowerPanel(ControllerPanel):
