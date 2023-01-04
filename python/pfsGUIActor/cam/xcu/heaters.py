@@ -1,16 +1,32 @@
 __author__ = 'alefur'
 
 from pfsGUIActor.cam import CamDevice
-from pfsGUIActor.control import CommandsGB
-from pfsGUIActor.widgets import SwitchGB, ValuesRow, ValueGB, CustomedCmd, CmdButton, DoubleSpinBoxGB, SwitchButton
 from pfsGUIActor.cam.xcu import addEng
+from pfsGUIActor.control import CommandsGB
+from pfsGUIActor.widgets import SwitchGB, ValuesRow, ValueGB, CustomedCmd, CmdButton, SpinBoxGB, SwitchButton
+
+
+class HeaterFraction(ValueGB):
+    def __init__(self, moduleRow, heaterNb):
+        ValueGB.__init__(self, moduleRow, 'heaters', 'power(%)', heaterNb + 2, '{:.2f}')
+
+    def setText(self, txt):
+        # Converting fraction to percentage.
+        try:
+            txt = '{:d}'.format(int(float(txt) * 100))
+        except ValueError:
+            txt = 'nan'
+
+        self.value.setText(txt)
+        self.customize()
+
 
 class HeaterState(ValuesRow):
     def __init__(self, controlPanel, name):
         heaterNb = controlPanel.heaterChannels[name]
         self.name = name
         widgets = [SwitchGB(controlPanel.moduleRow, 'heaters', 'enabled', heaterNb, '{:g}'),
-                   ValueGB(controlPanel.moduleRow, 'heaters', 'fraction', heaterNb + 2, '{:.2f}')]
+                   HeaterFraction(controlPanel.moduleRow, heaterNb)]
 
         ValuesRow.__init__(self, widgets, title=name.capitalize())
 
@@ -54,7 +70,7 @@ class FracCmd(CustomedCmd):
         self.name = name
         CustomedCmd.__init__(self, controlPanel, buttonLabel='SET %s' % name.upper())
 
-        self.value = DoubleSpinBoxGB('Power(percent)', vmin=0, vmax=100, decimals=2)
+        self.value = SpinBoxGB('Power(percent)', vmin=0, vmax=100)
         self.addWidget(self.value, 0, 1)
 
     def buildCmd(self):
