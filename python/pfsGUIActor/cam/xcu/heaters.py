@@ -1,7 +1,6 @@
 __author__ = 'alefur'
 
 from pfsGUIActor.cam import CamDevice
-from pfsGUIActor.cam.xcu import addEng
 from pfsGUIActor.control import CommandsGB
 from pfsGUIActor.widgets import SwitchGB, ValuesRow, ValueGB, CustomedCmd, CmdButton, SpinBoxGB, SwitchButton
 
@@ -74,7 +73,8 @@ class FracCmd(CustomedCmd):
         self.addWidget(self.value, 0, 1)
 
     def buildCmd(self):
-        return '%s heaters %s power=%d' % (self.controlPanel.actorName, self.name, self.value.getValue())
+        cmdHeaterName = 'ccd' if self.name == 'h4' else self.name
+        return '%s heaters %s power=%d' % (self.controlPanel.actorName, cmdHeaterName, self.value.getValue())
 
 
 class HeatersCommands(CommandsGB):
