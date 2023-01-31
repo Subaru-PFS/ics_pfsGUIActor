@@ -33,9 +33,9 @@ class HeaterState(ValuesRow):
 
 class HeatersPanel(CamDevice):
     visNames = ['spreader', 'ccd']
-    nirNames = ['shield', 'asic']
+    nirNames = ['shield', 'spreader', 'asic', 'h4']
     heaterNames = dict(b=visNames, r=visNames, n=nirNames)
-    heaterChannels = dict(ccd=4, spreader=5, asic=0, shield=1)
+    heaterChannels = dict(ccd=4, spreader=5, asic=0, shield=1, h4=4)
 
     def __init__(self, controlDialog):
         CamDevice.__init__(self, controlDialog, 'temps', 'Heaters')
@@ -43,7 +43,7 @@ class HeatersPanel(CamDevice):
 
     def createWidgets(self):
         sortedChannels = dict(sorted(self.heaterChannels.items(), key=lambda kv: kv[1])).keys()
-        heaterNames = sortedChannels if addEng else self.heaterNames[self.moduleRow.camRow.arm]
+        heaterNames = sortedChannels if False else self.heaterNames[self.moduleRow.camRow.arm]
         self.heaters = [HeaterState(self, name) for name in heaterNames]
 
     def setInLayout(self):
