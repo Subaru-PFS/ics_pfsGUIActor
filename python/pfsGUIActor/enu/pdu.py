@@ -43,12 +43,18 @@ class PduPanel(ControllerPanel):
         self.state = ValueGB(self.moduleRow, 'pduFSM', '', 0, '{:s}')
         self.substate = ValueGB(self.moduleRow, 'pduFSM', '', 1, '{:s}')
 
+        self.temps = ValueGB(self.moduleRow, 'rackSensor', 'Temps(°C)', 0, '{:.2f}')
+        self.humidity = ValueGB(self.moduleRow, 'rackSensor', 'Humidity(%)', 1, '{:.2f}')
+
         self.pduPorts = [PduPort(self.moduleRow, name, f'pduPort{portNb}') for name, portNb in self.ports.items()]
 
     def setInLayout(self):
         self.grid.addWidget(self.mode, 0, 0)
         self.grid.addWidget(self.state, 0, 1)
         self.grid.addWidget(self.substate, 0, 2)
+
+        self.grid.addWidget(self.temps, 0, 3)
+        self.grid.addWidget(self.humidity, 0, 4)
 
         for i, pduPort in enumerate(self.pduPorts):
             self.grid.addWidget(pduPort, 1 + i, 0, 1, 4)
