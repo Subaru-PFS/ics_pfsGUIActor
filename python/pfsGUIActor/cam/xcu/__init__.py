@@ -28,7 +28,7 @@ class SetButton(CmdButton):
 
 
 class SetCryoMode(CustomedCmd):
-    validModes = ('offline', 'standby', 'pumpdown', 'cooldown', 'operation', 'warmup', 'bakeout')
+    validModes = ('offline', 'roughing', 'pumpdown', 'cooldown', 'operation', 'warmup', 'bakeout')
 
     def __init__(self, controlDialog):
         GridLayout.__init__(self)
