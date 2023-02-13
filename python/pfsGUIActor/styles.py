@@ -215,6 +215,7 @@ state2color = {"default": ('window', 'black'),
                "success": ('chartreuse', 'white'),
                "warning": ('orange', 'white'),
                "orangered": ('orangered', 'white'),
+               "monitoring": ('skyblue', 'white'),
                }
 
 

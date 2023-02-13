@@ -11,7 +11,7 @@ from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtWidgets import QPushButton, QDoubleSpinBox, QSpinBox, QComboBox, QCheckBox, QLineEdit, QGridLayout, \
     QVBoxLayout, QHBoxLayout, QTabWidget, QLabel
 
-spacing = 2
+spacing = 1
 
 
 class TabWidget(QTabWidget):
