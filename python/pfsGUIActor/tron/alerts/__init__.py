@@ -112,7 +112,7 @@ class AlertLogic(ValueGB):
         ValueGB.__init__(self, controllerPanel.moduleRow, f'{keyName}_logic', 'alertLogic', 0, '{:s}')
 
     def getStyles(self, text):
-        text = 'ON' if text != "OFF" else text
+        text = 'ON' if text not in ["OFF", "MONITORING"] else text
         return ValueGB.getStyles(self, text)
 
 
