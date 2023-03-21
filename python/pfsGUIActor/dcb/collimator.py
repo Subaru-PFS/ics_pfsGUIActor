@@ -23,7 +23,7 @@ class MaskCombo(ValueGB):
         self.hide()
 
     def setText(self, txt):
-        self.combo.setCurrentText(txt)
+        self.combo.setCurrentText(txt[1:])
 
 
 class BundleCombo(ValueGB):
