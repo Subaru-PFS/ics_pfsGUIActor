@@ -1,35 +1,30 @@
 __author__ = 'alefur'
 
-import pfsGUIActor.styles as styles
-from pfsGUIActor.common import LineEdit
 from pfsGUIActor.control import ControlDialog
 from pfsGUIActor.dcb.filterwheel import FilterwheelPanel
+from pfsGUIActor.dcb.collimator import CollimatorPanel
 from pfsGUIActor.dcb.lamps import LampsPanel
 from pfsGUIActor.enu import ConnectCmd
 from pfsGUIActor.modulerow import ModuleRow, RowWidget
-from pfsGUIActor.widgets import ValueMRow, SwitchMRow, Controllers, ValueGB
+from pfsGUIActor.widgets import ValueMRow, SwitchMRow, Controllers
 
 
-class FiberConfig(ValueGB):
-    def __init__(self, controlDialog, key='fiberConfig', title='fiberConfig', fmt='{:s}', fontSize=styles.smallFont):
-        self.controlDialog = controlDialog
-        ValueGB.__init__(self, controlDialog.moduleRow, key=key, title=title, ind=0, fmt=fmt, fontSize=fontSize)
+class DesignId(ValueMRow):
+    def __init__(self, controlDialog):
+        ValueMRow.__init__(self,  controlDialog.moduleRow, 'designId', 'pfsDesignId', 0, '0x{:016x}')
 
-        self.fibers = LineEdit()
-        # self.fibers.editingFinished.connect(self.newConfig)
-        self.grid.removeWidget(self.value)
+    def updateVals(self, ind, fmt, keyvar):
+        try:
+            values = keyvar.getValue()
+            values = (values,) if not isinstance(values, tuple) else values
+            value = values[ind]
+            strValue = fmt.format(value)
 
-        self.grid.addWidget(self.fibers, 0, 0)
+        except (ValueError, TypeError):
+            strValue = 'UNDEFINED'
 
-    def setText(self, txt):
-        txt = ','.join(txt.split(';'))
-        self.fibers.setText(txt)
-
-    def newConfig(self):
-        cmdStr = 'config fibers=%s' % ','.join([fib.strip() for fib in self.fibers.text().split(',')])
-        self.controlDialog.moduleRow.mwindow.sendCommand(actor=self.controlDialog.moduleRow.actorName,
-                                                         cmdStr=cmdStr,
-                                                         callFunc=self.controlDialog.cmdLog.printResponse)
+        self.setText(strValue)
+        self.moduleRow.mwindow.heartBeat()
 
 
 class RowOne(RowWidget):
@@ -92,14 +87,16 @@ class DcbRow(ModuleRow):
 class DcbDialog(ControlDialog):
     def __init__(self, dcbRow):
         ControlDialog.__init__(self, moduleRow=dcbRow)
-        self.fiberConfig = FiberConfig(self)
+        self.designId = DesignId(self)
         self.connectCmd = ConnectCmd(self, ['lamps', 'filterwheel'])
 
-        self.topbar.addWidget(self.fiberConfig)
+        self.topbar.addWidget(self.designId)
         self.topbar.addLayout(self.connectCmd)
 
         self.lampsPanel = LampsPanel(self)
         self.filterwheelPanel = FilterwheelPanel(self)
+        self.collimatorPanel = CollimatorPanel(self)
 
         self.tabWidget.addTab(self.lampsPanel, 'Lamps')
-        self.tabWidget.addTab(self.filterwheelPanel, 'Filterwheels')
+        self.tabWidget.addTab(self.filterwheelPanel, 'Filterwheel')
+        self.tabWidget.addTab(self.collimatorPanel, 'Collimators')

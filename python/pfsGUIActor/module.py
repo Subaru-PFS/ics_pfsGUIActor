@@ -1,9 +1,6 @@
 __author__ = 'alefur'
 
 import pfsGUIActor.dcb as dcb
-import pfsGUIActor.lam.aten as lamAten
-import pfsGUIActor.lam.breva as lamBreva
-import pfsGUIActor.lam.sac as lamSac
 import pfsGUIActor.styles as styles
 from PyQt5.QtWidgets import QGroupBox
 from pfsGUIActor.cam import CamRow
@@ -16,8 +13,8 @@ from pfsGUIActor.sps import SpecModuleRow
 
 # lam import
 import pfsGUIActor.lam.aten as lamAten
-import pfsGUIActor.lam.sac as lamSac
 import pfsGUIActor.lam.breva as lamBreva
+import pfsGUIActor.lam.sac as lamSac
 
 
 class Module(QGroupBox):

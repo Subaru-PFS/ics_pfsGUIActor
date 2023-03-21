@@ -155,8 +155,7 @@ class ControlPanel(QWidget):
 
     def addCommandSet(self, commands):
         self.commands = commands
-        self.grid.addWidget(self.commands, 0, self.grid.columnCount(), self.grid.rowCount(),
-                            self.grid.columnCount())
+        self.grid.addWidget(self.commands, 0, self.grid.columnCount(), self.grid.rowCount(), self.grid.columnCount())
         self.spacer = QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.MinimumExpanding)
         self.grid.addItem(self.spacer, self.grid.rowCount(), 0)
 
