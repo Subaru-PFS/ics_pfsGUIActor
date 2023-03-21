@@ -116,7 +116,7 @@ class XcuRow(ModuleRow):
     def __init__(self, camRow):
         self.camRow = camRow
         ModuleRow.__init__(self, module=camRow.module,
-                           actorName='xcu_%s%i' % (camRow.arm, camRow.module.smId), actorLabel='XCU')
+                           actorName='xcu_%s%i' % (camRow.arm, camRow.module.specNum), actorLabel='XCU')
 
         self.cryoMode = ValueMRow(self, 'cryoMode', 'cryoMode', 0, '{:s}', controllerName='')
         self.temperature = DetectorTemp(self)

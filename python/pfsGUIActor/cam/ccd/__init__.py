@@ -56,7 +56,7 @@ class CcdRow(ModuleRow):
     def __init__(self, camRow):
         self.camRow = camRow
         ModuleRow.__init__(self, module=camRow.module,
-                           actorName='ccd_%s%i' % (camRow.arm, camRow.module.smId), actorLabel='CCD')
+                           actorName='ccd_%s%i' % (camRow.arm, camRow.module.specNum), actorLabel='CCD')
 
         self.substate = CcdState(self)
         self.controllers = Controllers(self)

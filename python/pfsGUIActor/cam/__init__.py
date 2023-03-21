@@ -130,7 +130,7 @@ class CamDialog(ControlDialog):
         self.moduleRow = camRow
         light, dark = CamDialog.back[camRow.arm]
         QDialog.__init__(self)
-        self.setWindowTitle('%s %i' % (camRow.label, camRow.module.smId))
+        self.setWindowTitle('%s %i' % (camRow.label, camRow.module.specNum))
 
         self.setStyleSheet(
             "QDialog { background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 0.25,stop: 0 #%s, stop: 1 #%s);}" % (

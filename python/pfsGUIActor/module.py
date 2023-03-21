@@ -1,7 +1,9 @@
 __author__ = 'alefur'
 
 import pfsGUIActor.dcb as dcb
-
+import pfsGUIActor.lam.aten as lamAten
+import pfsGUIActor.lam.breva as lamBreva
+import pfsGUIActor.lam.sac as lamSac
 import pfsGUIActor.styles as styles
 from PyQt5.QtWidgets import QGroupBox
 from pfsGUIActor.cam import CamRow
@@ -13,7 +15,6 @@ from pfsGUIActor.rough import RoughRow
 from pfsGUIActor.sps import SpecModuleRow
 
 # lam import
-
 import pfsGUIActor.lam.aten as lamAten
 import pfsGUIActor.lam.sac as lamSac
 import pfsGUIActor.lam.breva as lamBreva
@@ -22,8 +23,12 @@ import pfsGUIActor.lam.breva as lamBreva
 class Module(QGroupBox):
     def __init__(self, mwindow, title):
         QGroupBox.__init__(self)
+
         self.grid = GridLayout()
+        self.grid.setContentsMargins(0, 7, 0, 0)
+        self.grid.setSpacing(0)
         self.setLayout(self.grid)
+
         self.setTitle(title)
         self.mwindow = mwindow
         self.setStyleSheet()
@@ -46,13 +51,12 @@ class Module(QGroupBox):
         QGroupBox.setEnabled(self, a0)
 
     def setStyleSheet(self, styleSheet=None):
-        styleSheet = "QGroupBox {font-size: %ipt;border: 1px solid lightgray;border-radius: 3px;margin-top: 6px;} " % round(
-            0.9 * styles.bigFont) \
-                     + "QGroupBox::title {subcontrol-origin: margin;subcontrol-position: top left; padding: 0 0px;}"
-        QGroupBox.setStyleSheet(self, styleSheet)
+        QGroupBox.setStyleSheet(self,
+                                "QGroupBox{ font-size: %ipx ;font-weight: bold; " % (round(1.25 * styles.bigFont)) +
+                                "border: 1px solid lightgray;border-radius: 3px;margin-top: 6px;}")
 
 
-class SpsAitModule(Module):
+class AitModule(Module):
     def __init__(self, mwindow):
         Module.__init__(self, mwindow=mwindow, title='AIT')
         actors = mwindow.actor.displayConfig['ait']
@@ -84,15 +88,37 @@ class SpsAitModule(Module):
         return self.dcbs + self.roughs + self.lamAITRows
 
 
+class SpsModule(Module):
+    def __init__(self, mwindow):
+        Module.__init__(self, mwindow=mwindow, title='')
+
+        self.row = SpecModuleRow(self)
+
+        self.populateLayout()
+        self.adjustSize()
+
+    @property
+    def rows(self):
+        return [self.row]
+
+    def connect(self, specModules):
+        """"""
+        for specNum, specModule in specModules.items():
+            for specLabel in self.row.specLabels:
+                if specNum == specLabel.specNum:
+                    specLabel.connect(specModule)
+
+
 class SpecModule(Module):
-    def __init__(self, mwindow, smId, specConfig):
-        Module.__init__(self, mwindow=mwindow, title='Spectrograph Module %i' % smId)
-        self.smId = smId
+    def __init__(self, mwindow, specNum, specConfig):
+        self.specNum = specNum
+        Module.__init__(self, mwindow=mwindow, title='Spectrograph Module %i' % specNum)
+
         parts = []
 
         for part in specConfig:
             if part == 'enu':
-                parts.extend([SpecModuleRow(self, smId), EnuRow(self)])
+                parts.extend([EnuRow(self)])
             elif part in ['b', 'r', 'n']:
                 parts.append(CamRow(self, arm=part))
             else:

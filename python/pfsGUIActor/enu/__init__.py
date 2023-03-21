@@ -90,7 +90,7 @@ class Substate(ValueMRow):
 
 class EnuRow(ModuleRow):
     def __init__(self, specModule):
-        ModuleRow.__init__(self, module=specModule, actorName='enu_sm%i' % specModule.smId, actorLabel='ENU')
+        ModuleRow.__init__(self, module=specModule, actorName='enu_sm%i' % specModule.specNum, actorLabel='ENU')
 
         self.state = ValueMRow(self, 'metaFSM', '', 0, '{:s}')
         self.substate = Substate(self)
@@ -147,7 +147,7 @@ class ConnectCmd(CustomedCmd):
 
 class EnuDialog(ControlDialog):
     def __init__(self, enuRow):
-        ControlDialog.__init__(self, moduleRow=enuRow, title='Entrance Unit SM%i' % enuRow.module.smId)
+        ControlDialog.__init__(self, moduleRow=enuRow, title='Entrance Unit SM%i' % enuRow.module.specNum)
 
         self.startButton = CmdButton(controlPanel=None, label=' START ', controlDialog=self,
                                      cmdStr='%s start' % self.moduleRow.actorName)

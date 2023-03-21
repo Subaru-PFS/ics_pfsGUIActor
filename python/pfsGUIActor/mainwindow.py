@@ -3,7 +3,7 @@ __author__ = 'alefur'
 from PyQt5.QtWidgets import QSpacerItem, QSizePolicy
 from PyQt5.QtWidgets import QWidget, QMessageBox
 from pfsGUIActor.common import GridLayout
-from pfsGUIActor.module import SpsAitModule, SpecModule, PfiModule
+from pfsGUIActor.module import AitModule, SpecModule, SpsModule, PfiModule
 from pfsGUIActor.tron.module import TronModule
 
 
@@ -11,10 +11,13 @@ class PfsWidget(QWidget):
     def __init__(self, pfsGUI):
         QWidget.__init__(self)
         self.pfsGUI = pfsGUI
+        self.specModules = dict()
 
         self.mainLayout = GridLayout()
-        self.mainLayout.setSpacing(1)
-        self.mainLayout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(self.mainLayout)
+
+        self.mainLayout.setSpacing(5)
+        self.mainLayout.setContentsMargins(1, 1, 1, 1)
 
         nCol = 4
         # add spacer
@@ -24,20 +27,26 @@ class PfsWidget(QWidget):
         self.mainLayout.addWidget(self.tronModule, 1, nCol - 1, 1, 1)
 
         nRow = 2
-        self.mainLayout.addWidget(SpsAitModule(self), nRow, 0, 1, nCol)
+        self.mainLayout.addWidget(AitModule(self), nRow, 0, 1, nCol)
+        nRow += 1
+        self.spsModule = SpsModule(self)
+        self.mainLayout.addWidget(self.spsModule, nRow, 0, 1, nCol)
 
-        for smId in range(1, 12):
-            if 'sm%d' % smId not in self.actor.displayConfig.keys():
+        for specNum in range(1, 12):
+            if 'sm%d' % specNum not in self.actor.displayConfig.keys():
                 continue
 
             nRow += 1
-            specConfig = self.actor.displayConfig[f'sm{smId}']
-            self.mainLayout.addWidget(SpecModule(self, smId=smId, specConfig=specConfig), nRow, 0, 1, nCol)
+
+            specConfig = self.actor.displayConfig[f'sm{specNum}']
+            self.specModules[specNum] = SpecModule(self, specNum=specNum, specConfig=specConfig)
+            self.mainLayout.addWidget(self.specModules[specNum], nRow, 0, 1, nCol)
 
         if 'pfi' in self.actor.displayConfig.keys():
             self.mainLayout.addWidget(PfiModule(self), nRow + 1, 0, 1, nCol)
 
-        self.setLayout(self.mainLayout)
+        self.spsModule.connect(self.specModules)
+        self.adjustSize()
 
     @property
     def actor(self):
@@ -54,6 +63,10 @@ class PfsWidget(QWidget):
                                       timeLim=1600,
                                       callFunc=callFunc,
                                       callCodes=keyvar.AllCodes))
+
+    def adjustSize(self):
+        QWidget.adjustSize(self)
+        self.pfsGUI.adjustSize()
 
     def heartBeat(self):
         self.tronModule.tronStatus.dial.heartBeat()
