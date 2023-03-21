@@ -66,7 +66,7 @@ class PushButton(QPushButton):
 class ComboBox(QComboBox):
     def __init__(self, *args, **kwargs):
         QComboBox.__init__(self, *args, **kwargs)
-        self.setStyleSheet("QComboBox {font: %dpt; }" % (styles.smallFont))
+        self.setStyleSheet("QComboBox {font: %dpt; padding: 1px 1px 1px 1px;;}" % (styles.smallFont))
 
 
 class LineEdit(QLineEdit):

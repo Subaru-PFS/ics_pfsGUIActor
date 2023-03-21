@@ -44,7 +44,6 @@ class StrobeDuty(ValueGB):
         return self.spinbox.getValue()
 
 
-
 class SetStrobeParamCmd(CustomedCmd):
     def __init__(self, controlPanel):
         CustomedCmd.__init__(self, controlPanel=controlPanel, buttonLabel='SET STROBE')
@@ -72,6 +71,7 @@ class SetBiaPower(CustomedCmd):
     def buildCmd(self):
         cmdStr = '%s bia power=%i' % (self.controlPanel.actorName, self.power.getValue())
         return cmdStr
+
 
 class SwitchBia(SwitchButton):
     def __init__(self, controlPanel):
