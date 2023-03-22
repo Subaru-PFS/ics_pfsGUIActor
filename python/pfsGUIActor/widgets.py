@@ -49,10 +49,9 @@ class ValueGB(QGroupBox):
     def setBackground(self, background):
         col1, col2 = styles.colormap(background)
         bckColor = 'qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0  %s, stop: 1 %s)' % (col1, col2)
-        fontSize = max(8, round(0.85 * self.fontSize))
         self.setStyleSheet(
             "QGroupBox {font-size: %ipt; font-weight: normal; background-color: %s ;border: 1px solid gray;"
-            "border-radius: 3px;margin-top: 1ex;} " % (fontSize, bckColor) +
+            "border-radius: 3px;margin-top: 1ex;} " % (self.fontSize, bckColor) +
             "QGroupBox::title {subcontrol-origin: margin;subcontrol-position: top center; padding: 0 0px;}")
         return bckColor
 
@@ -152,7 +151,6 @@ class DoubleSpinBoxGB(QGroupBox):
         self.grid.addWidget(self.value, 0, 0)
 
         self.setLayout(self.grid)
-        fontSize = max(8, round(0.85 * fontSize))
         self.setStyleSheet(
             "QGroupBox {font-size: %ipt; font-weight: normal; border: 1px solid #d7d4d1;border-radius: 3px;margin-top: 1ex;} " % fontSize +
             "QGroupBox::title {subcontrol-origin: margin;subcontrol-position: top center; padding: 0 3px;}")
@@ -190,7 +188,6 @@ class SpinBoxGB(QGroupBox):
         self.grid.addWidget(self.value, 0, 0)
 
         self.setLayout(self.grid)
-        fontSize = max(8, round(0.85 * fontSize))
         self.setStyleSheet(
             "QGroupBox {font-size: %ipt; font-weight: normal; border: 1px solid #d7d4d1;border-radius: 3px;margin-top: 1ex;} " % fontSize +
             "QGroupBox::title {subcontrol-origin: margin;subcontrol-position: top center; padding: 0 3px;}")
@@ -283,9 +280,8 @@ class SwitchGB(ValueGB):
     def __init__(self, moduleRow, key, title, ind, fmt, fontSize=styles.smallFont):
         self.moduleRow = moduleRow
         ValueGB.__init__(self, moduleRow, key=key, title=title, ind=ind, fmt=fmt, fontSize=fontSize)
-        fontSize = max(8, round(0.85 * fontSize))
         self.setStyleSheet(
-            "QGroupBox {font-size: %ipt; font-weight: normal; border: 1px solid #d7d4d1;border-radius: 3px;margin-top: 1ex;} " % fontSize +
+            "QGroupBox {font-size: %ipt; font-weight: normal; border: 1px solid #d7d4d1;border-radius: 3px;margin-top: 1ex;} " % self.fontSize +
             "QGroupBox::title {subcontrol-origin: margin;subcontrol-position: top center; padding: 0 3px;}")
 
     def setText(self, txt):

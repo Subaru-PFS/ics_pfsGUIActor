@@ -21,13 +21,16 @@ class Module(QGroupBox):
     def __init__(self, mwindow, title):
         QGroupBox.__init__(self)
 
+        self.fontSize = int(round(1.25 * styles.bigFont))
         self.grid = GridLayout()
-        self.grid.setContentsMargins(0, 7, 0, 0)
+        self.grid.setContentsMargins(0, int(styles.bigFont*0.8), 0, 0)
         self.grid.setSpacing(0)
+
         self.setLayout(self.grid)
 
         self.setTitle(title)
         self.mwindow = mwindow
+
         self.setStyleSheet()
 
     @property
@@ -41,6 +44,8 @@ class Module(QGroupBox):
                     continue
                 self.grid.addWidget(widget, i, j)
 
+        self.adjustSize()
+
     def setEnabled(self, a0: bool) -> None:
         for row in self.rows:
             row.setOnline(a0)
@@ -49,7 +54,7 @@ class Module(QGroupBox):
 
     def setStyleSheet(self, styleSheet=None):
         QGroupBox.setStyleSheet(self,
-                                "QGroupBox{ font-size: %ipx ;font-weight: bold; " % (round(1.25 * styles.bigFont)) +
+                                "QGroupBox{ font-size: %ipx ;font-weight: bold; " % self.fontSize +
                                 "border: 1px solid lightgray;border-radius: 3px;margin-top: 6px;}")
 
 
@@ -78,7 +83,6 @@ class AitModule(Module):
         self.roughs = [RoughRow(self, rough) for rough in roughs]
 
         self.populateLayout()
-        self.adjustSize()
 
     @property
     def rows(self):
@@ -92,7 +96,7 @@ class SpsModule(Module):
         self.row = SpecModuleRow(self)
 
         self.populateLayout()
-        self.adjustSize()
+        self.grid.setContentsMargins(0, 0, 0, 0)
 
     @property
     def rows(self):
@@ -124,7 +128,6 @@ class SpecModule(Module):
         self.parts = parts
 
         self.populateLayout()
-        self.adjustSize()
 
     @property
     def rows(self):
@@ -138,7 +141,6 @@ class PfiModule(Module):
         self.pfiLamps = PfiLampsRow(self)
 
         self.populateLayout()
-        self.adjustSize()
 
     @property
     def rows(self):

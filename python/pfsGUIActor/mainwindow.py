@@ -16,7 +16,7 @@ class PfsWidget(QWidget):
         self.mainLayout = GridLayout()
         self.setLayout(self.mainLayout)
 
-        self.mainLayout.setSpacing(5)
+        self.mainLayout.setSpacing(1)
         self.mainLayout.setContentsMargins(1, 1, 1, 1)
 
         nCol = 4

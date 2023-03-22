@@ -2,7 +2,7 @@ __author__ = 'alefur'
 
 from pfsGUIActor.control import ControlPanel, CommandsGB, ControlDialog
 from pfsGUIActor.modulerow import ModuleRow
-from pfsGUIActor.widgets import ValueMRow, ValueGB, SwitchGB, CmdButton, ValuesRow
+from pfsGUIActor.widgets import ValueMRow, ValueGB, SwitchGB, CmdButton, ValuesRow, SwitchMRow
 
 
 class PfiLampsRow(ModuleRow):
@@ -11,7 +11,7 @@ class PfiLampsRow(ModuleRow):
     def __init__(self, pfiModule, name='pfilamps'):
         ModuleRow.__init__(self, module=pfiModule, actorName=name, actorLabel=name.upper())
 
-        self.lamps = [SwitchGB(self, f'lampRequestMask', lamp, i, '{:g}') for i, lamp in enumerate(PfiLampsRow.lampNames)]
+        self.lamps = [SwitchMRow(self, f'lampRequestMask', lamp, i, '{:g}') for i, lamp in enumerate(PfiLampsRow.lampNames)]
         self.lampStatus = ValueMRow(self, 'lampStatus', 'lampStatus', 0, '{:s}')
         self.createDialog(PfiLampsDialog(self))
 

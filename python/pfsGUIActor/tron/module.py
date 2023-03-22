@@ -32,6 +32,8 @@ class TronModule(QWidget):
     def __init__(self, mwindow):
         QWidget.__init__(self, mwindow)
         hbox = HBoxLayout()
+        hbox.setContentsMargins(0, 0, 0, 0)
+        hbox.setSpacing(0)
 
         self.mwindow = mwindow
         self.tronStatus = TronStatus()
@@ -45,11 +47,12 @@ class TronModule(QWidget):
         for widget in [self.tronStatus, self.alertsRow]:
             widget.setOnline(bool)
 
+        self.adjustSize()
+        self.mwindow.adjustSize()
+
 
 class TronStatus(ValueGB):
-    def __init__(self, fontSize=styles.smallFont):
-        self.fontSize = fontSize
-
+    def __init__(self):
         QGroupBox.__init__(self)
         self.setTitle('TRON')
 
@@ -64,6 +67,7 @@ class TronStatus(ValueGB):
         self.setLayout(self.grid)
 
     def setOnline(self, isOnline):
+        self.fontSize = styles.bigFont
         text = 'ONLINE' if isOnline else 'OFFLINE'
         key = text if isOnline else 'failed'
         self.value.setText(text)
