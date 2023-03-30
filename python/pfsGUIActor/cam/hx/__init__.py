@@ -77,7 +77,7 @@ class HxRow(ModuleRow):
     def __init__(self, camRow):
         self.camRow = camRow
         ModuleRow.__init__(self, module=camRow.module,
-                           actorName='hx_%s%i' % (camRow.arm, camRow.module.smId), actorLabel='HX')
+                           actorName='hx_%s%i' % (camRow.arm, camRow.module.specNum), actorLabel='HX')
 
         self.controllers = Controllers(self)
         self.substate = RampState(self)

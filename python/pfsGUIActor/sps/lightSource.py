@@ -7,9 +7,9 @@ from pfsGUIActor.widgets import ValueGB, CustomedCmd
 
 
 class LightSource:
-    def __init__(self, controlPanel, smId):
-        self.label = SpecLabel(controlPanel.moduleRow, smId)
-        self.lightSource = ValueGB(controlPanel.moduleRow, f'sm{smId}LightSource', '', 0, '{:s}')
+    def __init__(self, controlPanel, specNum):
+        self.label = SpecLabel(controlPanel.moduleRow, specNum)
+        self.lightSource = ValueGB(controlPanel.moduleRow, f'sm{specNum}LightSource', '', 0, '{:s}')
 
 
 class DeclareLightSourceCmd(CustomedCmd):
@@ -38,8 +38,8 @@ class LightSourcePanel(ControlPanel):
         self.addCommandSet(Commands(self))
 
     def createWidgets(self):
-        for smId in range(1, 5):
-            self.lightSources = [LightSource(self, smId) for smId in range(1, 5)]
+        for specNum in range(1, 5):
+            self.lightSources = [LightSource(self, specNum) for specNum in range(1, 5)]
 
     def setInLayout(self):
         for i in range(4):
