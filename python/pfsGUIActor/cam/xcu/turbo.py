@@ -1,4 +1,5 @@
 __author__ = 'alefur'
+
 import pfsGUIActor.styles as styles
 from pfsGUIActor.cam import CamDevice
 from pfsGUIActor.common import LineEdit
@@ -26,7 +27,15 @@ class Speed(ValueGB):
 
     def customize(self):
 
-        state = 'on' if float(self.value.text()) > 0 else 'off'
+        value = float(self.value.text())
+
+        if value > 89000:
+            state = 'on'
+        elif value > 1000:
+            state = 'moving'
+        else:
+            state = 'off'
+
         background, police = styles.colorWidget(state)
 
         self.setColor(background=background, police=police)
@@ -39,7 +48,6 @@ class TurboSwitch(SwitchButton):
         SwitchButton.__init__(self, controlPanel, 'turboSpeed', label='', cmdHead='',
                               cmdStrOn='%s start' % cmdHead, cmdStrOff='%s stop' % cmdHead,
                               labelOn='START', labelOff='STOP', safetyCheck=True)
-
 
     def setText(self, txt):
         try:
