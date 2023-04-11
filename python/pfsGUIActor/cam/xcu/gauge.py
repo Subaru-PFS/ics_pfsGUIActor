@@ -2,7 +2,7 @@ __author__ = 'alefur'
 from pfsGUIActor.cam import CamDevice
 from pfsGUIActor.common import LineEdit, ComboBox
 from pfsGUIActor.control import CommandsGB
-from pfsGUIActor.widgets import ValueGB, CmdButton, CustomedCmd
+from pfsGUIActor.widgets import ValueGB, CmdButton, CustomedCmd, ScientificN
 
 
 class RawCmd(CustomedCmd):
@@ -35,7 +35,7 @@ class GaugePanel(CamDevice):
             self.setMaximumWidth(maxWidth)
 
     def createWidgets(self):
-        self.pressure = ValueGB(self.moduleRow, 'pressure', 'Pressure(Torr)', 0, '{:g}')
+        self.pressure = ScientificN(self.moduleRow, 'pressure', 'Pressure(Torr)', 0, '{:.5e}')
 
     def setInLayout(self):
         self.grid.addWidget(self.pressure, 0, 0)

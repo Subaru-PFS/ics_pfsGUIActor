@@ -4,7 +4,7 @@ from pfsGUIActor.cam.xcu.gauge import GaugePanel
 from pfsGUIActor.rough.pump import PumpPanel
 from pfsGUIActor.control import ControlDialog, MultiplePanel
 from pfsGUIActor.modulerow import ModuleRow
-from pfsGUIActor.widgets import Controllers, ValueMRow
+from pfsGUIActor.widgets import Controllers, ValueMRow, ScientificNRow
 
 
 class RoughRow(ModuleRow):
@@ -14,7 +14,7 @@ class RoughRow(ModuleRow):
         self.warning = ValueMRow(self, 'pumpWarnings', 'Warnings', 1, '{:s}', controllerName='pump')
         self.errors = ValueMRow(self, 'pumpErrors', 'Errors', 1, '{:s}', controllerName='pump')
         self.speed = ValueMRow(self, 'pumpSpeed', 'Speed', 0, '{:g}', controllerName='pump')
-        self.pressure = ValueMRow(self, 'pressure', 'Pressure(Torr)', 0, '{:g}', controllerName='gauge')
+        self.pressure = ScientificNRow(self, 'pressure', 'Pressure(Torr)', 0, '{:.5e}', controllerName='gauge')
 
         self.controllers = Controllers(self)
         self.createDialog(RoughDialog(self))

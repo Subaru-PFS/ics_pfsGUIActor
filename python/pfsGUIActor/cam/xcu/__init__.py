@@ -15,7 +15,8 @@ from pfsGUIActor.cam.xcu.turbo import TurboPanel
 from pfsGUIActor.common import ComboBox, GridLayout
 from pfsGUIActor.control import ControlDialog, MultiplePanel, Topbar
 from pfsGUIActor.modulerow import ModuleRow
-from pfsGUIActor.widgets import Controllers, ValueMRow, CmdButton, CustomedCmd, ValueGB, SwitchMRow, SwitchGB
+from pfsGUIActor.widgets import Controllers, ValueMRow, CmdButton, CustomedCmd, ValueGB, SwitchMRow, SwitchGB, \
+    ScientificNRow
 
 
 class SetButton(CmdButton):
@@ -120,7 +121,7 @@ class XcuRow(ModuleRow):
 
         self.cryoMode = ValueMRow(self, 'cryoMode', 'cryoMode', 0, '{:s}', controllerName='')
         self.temperature = DetectorTemp(self)
-        self.pressure = ValueMRow(self, 'pressure', 'Pressure(Torr)', 0, '{:g}', controllerName='PCM')
+        self.pressure = ScientificNRow(self, 'pressure', 'Pressure(Torr)', 0, '{:.5e}', controllerName='PCM')
         self.twoIonPumps = TwoIonPumps(self)
         self.controllers = Controllers(self)
         self.actorStatus.button.setEnabled(False)

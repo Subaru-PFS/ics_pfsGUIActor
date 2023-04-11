@@ -37,14 +37,17 @@ class ValueGB(QGroupBox):
         values = (values,) if not isinstance(values, tuple) else values
 
         value = values[ind]
+        strValue = self.toString(fmt, value)
+        self.setText(strValue)
+        self.moduleRow.mwindow.heartBeat()
 
+    def toString(self, fmt, value):
         try:
             strValue = fmt.format(value)
         except TypeError:
             strValue = 'nan'
 
-        self.setText(strValue)
-        self.moduleRow.mwindow.heartBeat()
+        return strValue
 
     def setBackground(self, background):
         col1, col2 = styles.colormap(background)
@@ -58,7 +61,8 @@ class ValueGB(QGroupBox):
     def setColor(self, background, police='white'):
         self.setBackground(background=background)
         self.value.setStyleSheet(
-            "QLabel{font-size: %ipt; font-weight: normal; qproperty-alignment: AlignCenter; color:%s;}" % (self.fontSize, police))
+            "QLabel{font-size: %ipt; font-weight: normal; qproperty-alignment: AlignCenter; color:%s;}" % (
+                self.fontSize, police))
 
     def setText(self, txt):
         self.value.setText(txt)
@@ -383,6 +387,26 @@ class Controllers(ValueGB):
 class ValueMRow(ValueGB):
     def __init__(self, moduleRow, key, title, ind, fmt, controllerName='', fontSize=styles.bigFont):
         ValueGB.__init__(self, moduleRow, key, title, ind, fmt, fontSize=fontSize)
+        self.controllerName = controllerName
+
+
+class ScientificN(ValueGB):
+    def __init__(self, moduleRow, key, title, ind, fmt, fontSize=styles.smallFont):
+        ValueGB.__init__(self, moduleRow, key, title, ind, fmt, fontSize=fontSize)
+        self.fmt = fmt
+
+    def toString(self, fmt, value):
+        try:
+            fmt = self.fmt if value < 1 else '{:g}'
+            strValue = fmt.format(value)
+        except TypeError:
+            strValue = 'nan'
+        return strValue
+
+
+class ScientificNRow(ScientificN):
+    def __init__(self, moduleRow, key, title, ind, fmt, controllerName='', fontSize=styles.bigFont):
+        ScientificN.__init__(self, moduleRow, key, title, ind, fmt, fontSize=fontSize)
         self.controllerName = controllerName
 
 

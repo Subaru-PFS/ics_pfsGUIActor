@@ -3,7 +3,7 @@ __author__ = 'alefur'
 from pfsGUIActor.cam import CamDevice
 from pfsGUIActor.common import ComboBox, LineEdit
 from pfsGUIActor.control import ControllerCmd
-from pfsGUIActor.widgets import SwitchGB, ValuesRow, ValueGB, CustomedCmd
+from pfsGUIActor.widgets import SwitchGB, ValuesRow, ValueGB, CustomedCmd, ScientificN
 
 
 class Status(ValueGB):
@@ -24,7 +24,7 @@ class Ionpump(ValuesRow):
                    ValueGB(moduleRow, f'ionpump{pumpId}', 'volts', 1, '{:g}'),
                    ValueGB(moduleRow, f'ionpump{pumpId}', 'amps', 2, '{:g}'),
                    ValueGB(moduleRow, f'ionpump{pumpId}', 'temp', 3, '{:g}'),
-                   ValueGB(moduleRow, f'ionpump{pumpId}', 'pressure', 4, '{:g}')]
+                   ScientificN(moduleRow, f'ionpump{pumpId}', 'pressure', 4, '{:.3e}')]
 
         ValuesRow.__init__(self, widgets, title=f'ionpump{pumpId}'.capitalize())
 
