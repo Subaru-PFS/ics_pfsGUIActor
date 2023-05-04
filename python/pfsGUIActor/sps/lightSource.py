@@ -13,7 +13,7 @@ class LightSource:
 
 
 class DeclareLightSourceCmd(CustomedCmd):
-    known = ['dcb', 'dcb2', 'sunss', 'pfi']
+    known = ['dcb', 'dcb2', 'sunss', 'pfi', 'none']
 
     def __init__(self, controlPanel):
         CustomedCmd.__init__(self, controlPanel, buttonLabel='DECLARE')
