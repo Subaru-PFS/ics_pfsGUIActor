@@ -88,6 +88,7 @@ class ValueGB(QGroupBox):
 
 
 class StaticValueGB(ValueGB):
+    defaultColors = dict(background='white', police='black')
     def __init__(self, moduleRow, title, staticValue, fontSize=styles.smallFont):
         self.moduleRow = moduleRow
         self.title = title
@@ -106,7 +107,7 @@ class StaticValueGB(ValueGB):
         if not isOnline:
             self.setColor(*styles.colorWidget('offline'))
         else:
-            self.setColor(background='white', police='black')
+            self.setColor(**self.defaultColors)
 
     def __del__(self):
         pass

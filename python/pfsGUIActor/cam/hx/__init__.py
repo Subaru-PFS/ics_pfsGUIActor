@@ -9,11 +9,11 @@ from pfsGUIActor.widgets import Controllers, StaticValueGB
 
 
 class RampState(StaticValueGB):
+    defaultColors = dict(background='green', police='white')
     def __init__(self, moduleRow):
         self.moduleRow = moduleRow
         self.controllerName = ''
         StaticValueGB.__init__(self, moduleRow, '', 'IDLE', fontSize=styles.bigFont)
-        self.setColor('green')
 
         self.rampProgress = RampProgress(self)
         self.grid.addWidget(self.rampProgress, 0, 0)
