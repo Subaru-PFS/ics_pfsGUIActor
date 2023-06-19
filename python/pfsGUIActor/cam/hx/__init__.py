@@ -13,6 +13,7 @@ class RampState(StaticValueGB):
         self.moduleRow = moduleRow
         self.controllerName = ''
         StaticValueGB.__init__(self, moduleRow, '', 'IDLE', fontSize=styles.bigFont)
+        self.setColor('green')
 
         self.rampProgress = RampProgress(self)
         self.grid.addWidget(self.rampProgress, 0, 0)
@@ -26,6 +27,7 @@ class RampProgress(QProgressBar):
         self.hxRow = rampState.moduleRow
         self.hxRow.keyVarDict['ramp'].addCallback(self.setRampConfig, callNow=False)
         self.hxRow.keyVarDict['hxread'].addCallback(self.updateBar, callNow=False)
+        self.hxRow.keyVarDict['filename'].addCallback(self.setRampConfig, callNow=False)
 
         self.setStyleSheet("QProgressBar {background-color: rgba(0, 0, 0, 0);color:white;text-align: center; }")
 
