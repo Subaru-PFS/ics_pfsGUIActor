@@ -64,7 +64,7 @@ class DetectorTemp(ValueMRow):
 
         values = keyvar.getValue(doRaise=False)
 
-        temps = np.array([checkInvalid(values[i]) for i in [10, 11]])
+        temps = np.array([checkInvalid(values[i]) for i in [11]])
 
         try:
             value = np.nanmean(temps)
