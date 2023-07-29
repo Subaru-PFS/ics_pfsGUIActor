@@ -23,6 +23,7 @@ class DeclareLightSourceCmd(CustomedCmd):
 
         self.comboSM = ComboBox()
         self.comboSM.addItems(['SM1', 'SM2', 'SM3', 'SM4', 'SPS'])
+        self.comboSM.setMinimumWidth(45)
 
         self.addWidget(self.comboSM, 0, 1)
         self.addWidget(self.comboLight, 0, 2)
