@@ -127,9 +127,11 @@ class ControlDialog(QDialog):
 
 
 class ControlPanel(QWidget):
-    def __init__(self, controlDialog):
+    def __init__(self, controlDialog, tabWidget=None):
         QWidget.__init__(self)
         self.controlDialog = controlDialog
+        self.tabWidget = controlDialog.tabWidget if tabWidget is None else tabWidget
+
         self.grid = GridLayout()
         self.grid.setContentsMargins(*(4 * (1,)))
         self.grid.setSizeConstraint(QLayout.SetMinimumSize)
@@ -161,8 +163,8 @@ class ControlPanel(QWidget):
 
     def updateIcon(self, color):
         icon = Icon(f'{color}.png')
-        self.controlDialog.tabWidget.setTabIcon(self.controlDialog.tabWidget.indexOf(self), icon)
-        self.controlDialog.tabWidget.setIconSize(QSize(styles.bigFont + 2, styles.bigFont + 2))
+        self.tabWidget.setTabIcon(self.tabWidget.indexOf(self), icon)
+        self.tabWidget.setIconSize(QSize(styles.bigFont + 2, styles.bigFont + 2))
 
     def updateStatusIcon(self, a0: bool):
         color = 'green' if a0 else 'gray'
@@ -203,9 +205,9 @@ class CommandsGB(QGroupBox):
 
 
 class ControllerPanel(ControlPanel):
-    def __init__(self, controlDialog, controllerName):
+    def __init__(self, controlDialog, controllerName, tabWidget=None):
         self.controllerName = controllerName
-        ControlPanel.__init__(self, controlDialog=controlDialog)
+        ControlPanel.__init__(self, controlDialog=controlDialog, tabWidget=tabWidget)
 
     def setEnabled(self, a0):
         a0 = self.controllerName in self.moduleRow.keyVarDict['controllers'] if a0 else False

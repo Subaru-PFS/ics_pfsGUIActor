@@ -1,8 +1,10 @@
 __author__ = 'alefur'
 
+from functools import partial
+
 import ics.utils.instdata.io as instdataIO
-from PyQt5.QtWidgets import QSpacerItem, QSizePolicy
-from pfsGUIActor.common import ComboBox, GridLayout
+from PyQt5.QtCore import QTimer
+from pfsGUIActor.common import ComboBox, GridLayout, TabWidget
 from pfsGUIActor.control import ControlDialog, ControllerPanel
 from pfsGUIActor.modulerow import ModuleRow
 from pfsGUIActor.widgets import StaticValueGB, ValueGB, CmdButton, ValueMRow, Controllers, \
@@ -142,10 +144,10 @@ class AlertObject:
 
 class AlertPanel(ControllerPanel):
 
-    def __init__(self, controlDialog, actorName, stsConfig):
+    def __init__(self, controlDialog, tabWidget, actorName, stsConfig):
         self.stsConfig = stsConfig
         self.alerts = []
-        ControllerPanel.__init__(self, controlDialog, actorName)
+        ControllerPanel.__init__(self, controlDialog, actorName, tabWidget=tabWidget)
 
     def createWidgets(self):
         for keyVarName, keysConfig in self.stsConfig.items():
@@ -164,8 +166,8 @@ class AlertPanel(ControllerPanel):
 
     def setInLayout(self):
         """Set spacer"""
-        self.spacer = QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.MinimumExpanding)
-        self.grid.addItem(self.spacer, self.grid.rowCount(), 0)
+        # self.spacer = QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.MinimumExpanding)
+        # self.grid.addItem(self.spacer, self.grid.rowCount(), 0)
 
     def updateStatusIcon(self, a0):
         if not a0:
@@ -176,10 +178,38 @@ class AlertPanel(ControllerPanel):
         else:
             self.updateIcon('green')
 
+    def widgetList(self):
+        widgets = [self.layout().itemAt(j).widget() for j in range(self.layout().count())]
+        widgets = [widget for widget in widgets if widget is not None]
+        return widgets
+
+    def hideAll(self):
+        for widget in self.widgetList():
+            widget.hide()
+
+        self.adjustSize()
+
+    def showAll(self):
+        for widget in self.widgetList():
+            widget.show()
+
+        self.adjustSize()
+
 
 class AlertsDialog(ControlDialog):
     def __init__(self, alertsRow):
         ControlDialog.__init__(self, moduleRow=alertsRow, title='ALERTS')
+        self.tabWidgets = [self.tabWidget]
+
+        def addAlertPanel(tabWidget, actorName, alertConfig=None, title=None):
+            """"""
+            alertConfig = stsConfig[actorName] if alertConfig is None else alertConfig
+            title = actorName if title is None else title
+
+            alertPannel = AlertPanel(self, tabWidget, actorName, alertConfig)
+            alertPannel.hideAll()
+
+            tabWidget.addTab(alertPannel, title)
 
         stsConfig, alertsActorConfig = self.loadAlertsConfig()
 
@@ -190,9 +220,34 @@ class AlertsDialog(ControlDialog):
         self.connectCmd = ConnectCmd(self, actorNames)
         self.topbar.addLayout(self.connectCmd)
 
-        for actorName in actorNames:
-            alertPannel = AlertPanel(self, actorName, stsConfig[actorName])
-            self.tabWidget.addTab(alertPannel, actorName)
+        pebConfig = stsConfig['peb']
+        temps = pebConfig.pop('temps', None)
+
+        addAlertPanel(self.tabWidget, 'peb', alertConfig=pebConfig)
+        addAlertPanel(self.tabWidget, 'peb', alertConfig=dict(temps=temps), title='pebTemps')
+
+        addAlertPanel(self.tabWidget, 'meb')
+
+        for spectrograph in range(1, 5):
+            tab = TabWidget(self)
+
+            roughNumber = (spectrograph + 1) // 2
+            for arm in 'brn':
+                addAlertPanel(tab, f'xcu_{arm}{spectrograph}')
+
+            addAlertPanel(tab, f'enu_sm{spectrograph}')
+            addAlertPanel(tab, f'rough{roughNumber}')
+
+            self.vbox.insertWidget(1 + spectrograph, tab)
+            self.tabWidgets.append(tab)
+
+        for tabWidget in self.tabWidgets:
+            tabWidget.currentChanged.connect(partial(self.adjustWindowSize, tabWidget))
+            tabWidget.setUsesScrollButtons(False)
+
+    @property
+    def pannels(self):
+        return sum([[tabWidget.widget(i) for i in range(tabWidget.count())] for tabWidget in self.tabWidgets], [])
 
     @property
     def site(self):
@@ -209,3 +264,12 @@ class AlertsDialog(ControlDialog):
             stsConfig.update(moreCfg['actors'])
 
         return stsConfig, alertsActorConfig
+
+    def adjustWindowSize(self, tabWidget, index):
+        widget = tabWidget.widget(index)
+
+        for pannel in self.pannels:
+            pannel.hideAll()
+
+        widget.showAll()
+        QTimer.singleShot(1, self.adjustSize)
