@@ -197,6 +197,8 @@ class AlertPanel(ControllerPanel):
 
 
 class AlertsDialog(ControlDialog):
+    roughIds = {1: 1, 2: 2, 3: 2, 4: 1}
+
     def __init__(self, alertsRow):
         ControlDialog.__init__(self, moduleRow=alertsRow, title='ALERTS')
         self.tabWidgets = [self.tabWidget]
@@ -231,7 +233,7 @@ class AlertsDialog(ControlDialog):
         for spectrograph in range(1, 5):
             tab = TabWidget(self)
 
-            roughNumber = (spectrograph + 1) // 2
+            roughNumber = self.roughIds[spectrograph]
             for arm in 'brn':
                 addAlertPanel(tab, f'xcu_{arm}{spectrograph}')
 
