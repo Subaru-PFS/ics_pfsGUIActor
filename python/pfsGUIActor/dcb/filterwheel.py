@@ -16,11 +16,17 @@ class Wheel(ValuesRow):
 
 
 class SetFilterwheel(CustomedCmd):
-    lineHoles = 0.5, 1.0, 2.0, 4.0, 12.7
-    qthHoles = 'none', 0.7, 1.0, 2.0, 4.0
+    lineHolesConfig = dict(dcb=[1.8, 2.5, 4.0, 5.7, 12.7],
+                           dcb2=[0.5, 1.0, 2.0, 4.0, 12.7])
+
+    qthHolesConfig = dict(dcb=[1.8, 2.5, 3.3, 5.7, 12.7],
+                          dcb2=['none', 0.7, 1.0, 2.0, 4.0])
 
     def __init__(self, controlPanel):
         CustomedCmd.__init__(self, controlPanel=controlPanel, buttonLabel='SET')
+
+        self.lineHoles = SetFilterwheel.lineHolesConfig[controlPanel.actorName]
+        self.qthHoles = SetFilterwheel.qthHolesConfig[controlPanel.actorName]
 
         self.comboWheel = ComboBox()
         self.comboWheel.addItems(['LINEWHEEL', 'QTHWHEEL'])
@@ -28,8 +34,8 @@ class SetFilterwheel(CustomedCmd):
         self.comboLinePosition = ComboBox()
         self.comboQthPosition = ComboBox()
 
-        self.comboLinePosition.addItems([f'{hole}' for hole in SetFilterwheel.lineHoles])
-        self.comboQthPosition.addItems([f'{hole}' for hole in SetFilterwheel.qthHoles])
+        self.comboLinePosition.addItems([f'{hole}' for hole in self.lineHoles])
+        self.comboQthPosition.addItems([f'{hole}' for hole in self.qthHoles])
 
         self.addWidget(self.comboWheel, 0, 1)
         self.addWidget(self.comboLinePosition, 0, 2)
