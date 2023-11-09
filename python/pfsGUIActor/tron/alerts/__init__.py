@@ -201,6 +201,7 @@ class AlertsDialog(ControlDialog):
 
     def __init__(self, alertsRow):
         ControlDialog.__init__(self, moduleRow=alertsRow, title='ALERTS')
+        self.isLocked = False
         self.tabWidgets = [self.tabWidget]
 
         def addAlertPanel(tabWidget, actorName, alertConfig=None, title=None):
@@ -245,6 +246,7 @@ class AlertsDialog(ControlDialog):
 
         for tabWidget in self.tabWidgets:
             tabWidget.currentChanged.connect(partial(self.adjustWindowSize, tabWidget))
+            tabWidget.tabBarClicked.connect(partial(self.adjustWindowSize, tabWidget))
             tabWidget.setUsesScrollButtons(False)
 
     @property
@@ -268,10 +270,22 @@ class AlertsDialog(ControlDialog):
         return stsConfig, alertsActorConfig
 
     def adjustWindowSize(self, tabWidget, index):
+        if self.lock():
+            return
+
         widget = tabWidget.widget(index)
 
         for pannel in self.pannels:
             pannel.hideAll()
 
         widget.showAll()
-        QTimer.singleShot(1, self.adjustSize)
+        QTimer.singleShot(10, self.adjustSize)
+        QTimer.singleShot(100, self.unlock)
+
+    def lock(self):
+        wasLocked = self.isLocked
+        self.isLocked = True if not wasLocked else wasLocked
+        return wasLocked
+
+    def unlock(self):
+        self.isLocked = False
