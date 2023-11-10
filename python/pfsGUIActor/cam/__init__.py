@@ -3,12 +3,33 @@ __author__ = 'alefur'
 import os
 
 import pfsGUIActor.styles as styles
+from PyQt5.QtGui import QFont, QColor
 from PyQt5.QtWidgets import QDialog, QGroupBox, QGridLayout, QLayout
-from pfsGUIActor.common import PushButton, imgPath, VBoxLayout, GridLayout, TabWidget
+from pfsGUIActor.common import PushButton, imgPath, GridLayout, TabWidget, Label
 from pfsGUIActor.control import ControlDialog, ButtonBox, ControlPanel, ControllerPanel
 from pfsGUIActor.logs import CmdLogArea
 from pfsGUIActor.modulerow import ActorGB, ModuleRow
 from pfsGUIActor.widgets import ValueGB
+
+
+class CamLabel(Label):
+    def __init__(self, label):
+        super().__init__(label.upper())
+
+        # Set font properties
+        font = QFont()
+        font.setPointSize(30)
+        font.setBold(True)
+        self.setFont(font)
+
+        # Set background to transparent
+        self.setAutoFillBackground(True)
+        palette = self.palette()
+        palette.setColor(self.backgroundRole(), QColor(0, 0, 0, 0))
+        self.setPalette(palette)
+
+        # Set text color to white
+        self.setStyleSheet("color: white;")
 
 
 class CamDevice(QGroupBox):
@@ -48,7 +69,7 @@ class CamDevice(QGroupBox):
             "CamDevice::title {subcontrol-origin: margin;subcontrol-position: top left; padding: 0 10px;}"
             "CamDevice::indicator { width:%ipx; height: %ipx;}"
             "CamDevice::indicator:checked {image: url(%s);} " % (
-            styles.smallFont, styles.bigFont + 2, styles.bigFont + 2, os.path.join(imgPath, filename)))
+                styles.smallFont, styles.bigFont + 2, styles.bigFont + 2, os.path.join(imgPath, filename)))
 
     def setEnabled(self, a0):
         ControllerPanel.setEnabled(self, a0)
@@ -112,7 +133,8 @@ class CamRow(ModuleRow):
 
     @property
     def displayed(self):
-        return [self.actorStatus, self.xcu.cryoMode, self.detector.substate, self.xcu.temperature, self.xcu.pressure,  self.xcu.twoIonPumps]
+        return [self.actorStatus, self.xcu.cryoMode, self.detector.substate, self.xcu.temperature, self.xcu.pressure,
+                self.xcu.twoIonPumps]
 
     @property
     def isNir(self):
@@ -136,8 +158,8 @@ class CamDialog(ControlDialog):
             "QDialog { background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 0.25,stop: 0 #%s, stop: 1 #%s);}" % (
                 light, dark))
 
-        self.vbox = VBoxLayout()
-        self.vbox.setSizeConstraint(QLayout.SetMinimumSize)
+        self.grid = GridLayout()
+        self.grid.setSizeConstraint(QLayout.SetMinimumSize)
         self.tabWidget = TabWidget(self)
         self.cmdBuffer = dict()
 
@@ -152,13 +174,14 @@ class CamDialog(ControlDialog):
 
         buttonBox = ButtonBox(self)
 
-        self.vbox.addLayout(self.xcuDialog.topbar)
-        self.vbox.addLayout(self.detectorDialog.topbar)
-        self.vbox.addWidget(self.tabWidget)
-        self.vbox.addLayout(buttonBox)
-        self.vbox.addWidget(self.logArea)
+        self.grid.addLayout(self.xcuDialog.topbar, 0, 0, 1, 5)
+        self.grid.addLayout(self.detectorDialog.topbar, 1, 0, 1, 3)
+        self.grid.addWidget(CamLabel(f'{camRow.label[0]}{camRow.module.specNum}'), 0, 8, 2, 1)
+        self.grid.addWidget(self.tabWidget, 2, 0, 1, 9)
+        self.grid.addLayout(buttonBox, 3, 0, 1, 9)
+        self.grid.addWidget(self.logArea, 4, 0, 1, 9)
 
-        self.setLayout(self.vbox)
+        self.setLayout(self.grid)
         self.setVisible(False)
 
     @property
