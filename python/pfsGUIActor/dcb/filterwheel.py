@@ -4,7 +4,7 @@ from pfsGUIActor.common import ComboBox
 from pfsGUIActor.control import ControllerPanel
 from pfsGUIActor.enu import EnuDeviceCmd
 from pfsGUIActor.widgets import ValueGB, CustomedCmd, CmdButton, ValuesRow
-
+from ics.utils.instdata import instconfig
 
 class Wheel(ValuesRow):
     def __init__(self, moduleRow, name):
@@ -16,17 +16,13 @@ class Wheel(ValuesRow):
 
 
 class SetFilterwheel(CustomedCmd):
-    lineHolesConfig = dict(dcb=[1.8, 2.5, 4.0, 5.7, 12.7],
-                           dcb2=[0.5, 1.0, 2.0, 4.0, 12.7])
-
-    qthHolesConfig = dict(dcb=[1.8, 2.5, 3.3, 5.7, 12.7],
-                          dcb2=['none', 0.7, 1.0, 2.0, 4.0])
 
     def __init__(self, controlPanel):
         CustomedCmd.__init__(self, controlPanel=controlPanel, buttonLabel='SET')
 
-        self.lineHoles = SetFilterwheel.lineHolesConfig[controlPanel.actorName]
-        self.qthHoles = SetFilterwheel.qthHolesConfig[controlPanel.actorName]
+        dcbConfig = instconfig.InstConfig(controlPanel.actorName)
+        self.lineHoles = dcbConfig['filterwheel']['lineHoles']
+        self.qthHoles = dcbConfig['filterwheel']['qthHoles']
 
         self.comboWheel = ComboBox()
         self.comboWheel.addItems(['LINEWHEEL', 'QTHWHEEL'])
