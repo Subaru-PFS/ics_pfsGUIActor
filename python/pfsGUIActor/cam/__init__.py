@@ -14,7 +14,7 @@ from pfsGUIActor.widgets import ValueGB
 
 class CamLabel(Label):
     def __init__(self, label):
-        super().__init__(label.upper())
+        super().__init__(label)
 
         # Set font properties
         font = QFont()
@@ -106,7 +106,7 @@ class CamStatus(ActorGB, QGroupBox):
         self.setLayout(self.grid)
 
         self.setColor(*styles.colorWidget('offline'))
-        self.setText(cam.label)
+        self.setText(cam.camName.upper())
 
     def setStatus(self, status):
         if status == 0:
@@ -121,7 +121,7 @@ class CamRow(ModuleRow):
     def __init__(self, module, arm):
         self.module = module
         self.arm = arm
-        self.label = '%sCU' % arm.upper()
+        self.camName = f'{arm}{module.specNum}'
         self.actorStatus = CamStatus(self)
         self.actorStatus.button.clicked.connect(self.showDetails)
 
@@ -152,7 +152,7 @@ class CamDialog(ControlDialog):
         self.moduleRow = camRow
         light, dark = CamDialog.back[camRow.arm]
         QDialog.__init__(self)
-        self.setWindowTitle('%s %i' % (camRow.label, camRow.module.specNum))
+        self.setWindowTitle(camRow.camName.upper())
 
         self.setStyleSheet(
             "QDialog { background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 0.25,stop: 0 #%s, stop: 1 #%s);}" % (
@@ -176,7 +176,7 @@ class CamDialog(ControlDialog):
 
         self.grid.addLayout(self.xcuDialog.topbar, 0, 0, 1, 5)
         self.grid.addLayout(self.detectorDialog.topbar, 1, 0, 1, 3)
-        self.grid.addWidget(CamLabel(f'{camRow.label[0]}{camRow.module.specNum}'), 0, 8, 2, 1)
+        self.grid.addWidget(CamLabel(camRow.camName.upper()), 0, 8, 2, 1)
         self.grid.addWidget(self.tabWidget, 2, 0, 1, 9)
         self.grid.addLayout(buttonBox, 3, 0, 1, 9)
         self.grid.addWidget(self.logArea, 4, 0, 1, 9)
