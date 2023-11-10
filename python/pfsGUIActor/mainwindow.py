@@ -1,5 +1,8 @@
 __author__ = 'alefur'
 
+from functools import partial
+
+from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QSpacerItem, QSizePolicy
 from PyQt5.QtWidgets import QWidget, QMessageBox
 from pfsGUIActor.common import GridLayout
@@ -10,6 +13,7 @@ from pfsGUIActor.tron.module import TronModule
 class PfsWidget(QWidget):
     def __init__(self, pfsGUI):
         QWidget.__init__(self)
+        self.isLocked = False
         self.pfsGUI = pfsGUI
         self.specModules = dict()
 
@@ -65,11 +69,24 @@ class PfsWidget(QWidget):
                                       callCodes=keyvar.AllCodes))
 
     def adjustSize(self):
-        QWidget.adjustSize(self)
-        self.pfsGUI.adjustSize()
+        if self.lock():
+            return
+
+        QTimer.singleShot(100, partial(QWidget.adjustSize, self))
+        QTimer.singleShot(200, self.pfsGUI.adjustSize)
+        QTimer.singleShot(500, self.unlock)
+
+    def lock(self):
+        wasLocked = self.isLocked
+        self.isLocked = True if not wasLocked else wasLocked
+        return wasLocked
+
+    def unlock(self):
+        self.isLocked = False
 
     def heartBeat(self):
         self.tronModule.tronStatus.dial.heartBeat()
+        self.adjustSize()
 
     def showError(self, title, error):
         reply = QMessageBox.critical(self, title, error, QMessageBox.Ok)
