@@ -60,12 +60,11 @@ class Topbar(QHBoxLayout):
 
 
 class ControlDialog(QDialog):
-    def __init__(self, moduleRow, title=False):
+    def __init__(self, moduleRow, title=False, addGridRows=False):
         self.moduleRow = moduleRow
         title = moduleRow.actorLabel if not title else title
         QDialog.__init__(self)
         self.cmdBuffer = dict()
-        self.vbox = VBoxLayout()
 
         self.topbar = Topbar(self)
         self.tabWidget = TabWidget(self)
@@ -77,15 +76,24 @@ class ControlDialog(QDialog):
         self.logArea.addTab(self.cmdLog, 'cmdLog')
         self.logArea.addTab(self.rawLog, 'rawLog')
 
-        buttonBox = ButtonBox(self)
+        self.buttonBox = ButtonBox(self)
 
-        self.vbox.addLayout(self.topbar)
+        if not addGridRows:
+            self.vbox = VBoxLayout()
+            self.vbox.addLayout(self.topbar)
+            self.vbox.addWidget(self.tabWidget)
+            self.vbox.addLayout(self.buttonBox)
+            self.vbox.addWidget(self.logArea)
+            self.setLayout(self.vbox)
+        else:
+            self.grid = GridLayout()
+            self.grid.setSizeConstraint(QLayout.SetMinimumSize)
+            self.grid.addLayout(self.topbar, 0, 0, 1, 5)
+            self.grid.addWidget(self.tabWidget, 1, 0, addGridRows, 9)
+            self.grid.addLayout(self.buttonBox, addGridRows + 1, 0, 1, 9)
+            self.grid.addWidget(self.logArea, addGridRows + 2, 0, 1, 9)
+            self.setLayout(self.grid)
 
-        self.vbox.addWidget(self.tabWidget)
-        self.vbox.addLayout(buttonBox)
-        self.vbox.addWidget(self.logArea)
-
-        self.setLayout(self.vbox)
         self.setWindowTitle(title)
         self.setVisible(False)
         self.move(self.moduleRow.mwindow.pfsGUI.screenWidth * 0.3, self.moduleRow.mwindow.pfsGUI.screenHeight * 0.5)

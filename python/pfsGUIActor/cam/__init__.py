@@ -3,33 +3,12 @@ __author__ = 'alefur'
 import os
 
 import pfsGUIActor.styles as styles
-from PyQt5.QtGui import QFont, QColor
 from PyQt5.QtWidgets import QDialog, QGroupBox, QGridLayout, QLayout
-from pfsGUIActor.common import PushButton, imgPath, GridLayout, TabWidget, Label
+from pfsGUIActor.common import PushButton, imgPath, GridLayout, TabWidget
 from pfsGUIActor.control import ControlDialog, ButtonBox, ControlPanel, ControllerPanel
 from pfsGUIActor.logs import CmdLogArea
 from pfsGUIActor.modulerow import ActorGB, ModuleRow
-from pfsGUIActor.widgets import ValueGB
-
-
-class CamLabel(Label):
-    def __init__(self, label):
-        super().__init__(label)
-
-        # Set font properties
-        font = QFont()
-        font.setPointSize(30)
-        font.setBold(True)
-        self.setFont(font)
-
-        # Set background to transparent
-        self.setAutoFillBackground(True)
-        palette = self.palette()
-        palette.setColor(self.backgroundRole(), QColor(0, 0, 0, 0))
-        self.setPalette(palette)
-
-        # Set text color to white
-        self.setStyleSheet("color: white;")
+from pfsGUIActor.widgets import ValueGB, SubSystemLabel
 
 
 class CamDevice(QGroupBox):
@@ -176,7 +155,7 @@ class CamDialog(ControlDialog):
 
         self.grid.addLayout(self.xcuDialog.topbar, 0, 0, 1, 5)
         self.grid.addLayout(self.detectorDialog.topbar, 1, 0, 1, 3)
-        self.grid.addWidget(CamLabel(camRow.camName.upper()), 0, 8, 2, 1)
+        self.grid.addWidget(SubSystemLabel(camRow.camName.upper()), 0, 8, 2, 1)
         self.grid.addWidget(self.tabWidget, 2, 0, 1, 9)
         self.grid.addLayout(buttonBox, 3, 0, 1, 9)
         self.grid.addWidget(self.logArea, 4, 0, 1, 9)

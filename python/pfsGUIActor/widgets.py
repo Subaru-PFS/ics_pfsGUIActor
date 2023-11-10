@@ -4,8 +4,9 @@ from functools import partial
 
 import pfsGUIActor.styles as styles
 from PyQt5.QtCore import QTimer
+from PyQt5.QtGui import QFont, QColor
 from PyQt5.QtWidgets import QLabel, QGroupBox, QMessageBox
-from pfsGUIActor.common import PushButton, DoubleSpinBox, SpinBox, GridLayout, GBoxGrid
+from pfsGUIActor.common import PushButton, DoubleSpinBox, SpinBox, GridLayout, GBoxGrid, Label
 
 convertText = {'on': 'ON', 'off': 'OFF', 'nan': 'nan', 'undef': 'undef', 'pending': 'OFF'}
 
@@ -89,6 +90,7 @@ class ValueGB(QGroupBox):
 
 class StaticValueGB(ValueGB):
     defaultColors = dict(background='white', police='black')
+
     def __init__(self, moduleRow, title, staticValue, fontSize=styles.smallFont):
         self.moduleRow = moduleRow
         self.title = title
@@ -438,3 +440,23 @@ class MonitorCmd(CustomedCmd):
                                                           self.period.getValue())
 
         return cmdStr
+
+
+class SubSystemLabel(Label):
+    def __init__(self, label, color='white', fontsize=30):
+        super().__init__(label)
+
+        # Set font properties
+        font = QFont()
+        font.setPointSize(fontsize)
+        font.setBold(True)
+        self.setFont(font)
+
+        # Set background to transparent
+        self.setAutoFillBackground(True)
+        palette = self.palette()
+        palette.setColor(self.backgroundRole(), QColor(0, 0, 0, 0))
+        self.setPalette(palette)
+
+        # Set text color to white
+        self.setStyleSheet(f"color: {color};")

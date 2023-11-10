@@ -1,8 +1,8 @@
 __author__ = 'alefur'
 
 from PyQt5.QtWidgets import QProgressBar
-
 from pfsGUIActor.control import ControllerCmd, ControlDialog
+from pfsGUIActor.widgets import SubSystemLabel
 
 
 class EnuDeviceCmd(ControllerCmd):
@@ -147,7 +147,8 @@ class ConnectCmd(CustomedCmd):
 
 class EnuDialog(ControlDialog):
     def __init__(self, enuRow):
-        ControlDialog.__init__(self, moduleRow=enuRow, title='Entrance Unit SM%i' % enuRow.module.specNum)
+        ControlDialog.__init__(self, moduleRow=enuRow, title='Entrance Unit SM%i' % enuRow.module.specNum,
+                               addGridRows=12)
 
         self.startButton = CmdButton(controlPanel=None, label=' START ', controlDialog=self,
                                      cmdStr='%s start' % self.moduleRow.actorName)
@@ -176,3 +177,5 @@ class EnuDialog(ControlDialog):
         self.tabWidget.addTab(self.tempsPanel, 'TEMPS')
         self.tabWidget.addTab(self.pduPanel, 'PDU')
         self.tabWidget.addTab(self.iisPanel, 'IIS')
+
+        self.grid.addWidget(SubSystemLabel(f'SM{enuRow.module.specNum}', color='black', fontsize=20), 0, 8, 2, 1)
