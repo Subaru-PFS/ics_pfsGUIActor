@@ -35,7 +35,7 @@ class RowOne(RowWidget):
     def widgets(self):
         dcbRow = self.moduleRow
         states = [dcbRow.state, dcbRow.substate]
-        return states + [dcbRow.linewheel, dcbRow.qthwheel, dcbRow.adc1, dcbRow.adc2]
+        return states + [dcbRow.powerFilterwheel, dcbRow.linewheel, dcbRow.qthwheel, dcbRow.adc1]
 
 
 class RowTwo(RowWidget):
@@ -47,9 +47,9 @@ class RowTwo(RowWidget):
         dcbRow = self.moduleRow
 
         if dcbRow.actorName == 'dcb':
-            lamps = [dcbRow.qth, dcbRow.hgar, dcbRow.neon, dcbRow.krypton, dcbRow.argon, dcbRow.allFiberLamp]
+            lamps = [dcbRow.qth, dcbRow.neon, dcbRow.hgar, dcbRow.argon, dcbRow.krypton, dcbRow.allFiberLamp]
         else:
-            lamps = [dcbRow.qth, dcbRow.hgar, dcbRow.neon, dcbRow.krypton, dcbRow.argon, dcbRow.xenon]
+            lamps = [dcbRow.qth, dcbRow.neon, dcbRow.hgar, dcbRow.argon, dcbRow.krypton, dcbRow.xenon]
 
         return lamps
 
@@ -73,6 +73,7 @@ class DcbRow(ModuleRow):
         self.qth = SwitchMRow(self, 'halogen', 'QTH', 0, '{:g}', controllerName='lamps')
         self.allFiberLamp = SwitchMRow(self, 'allFiberLamp', 'allFiberLamp', 0, '{:g}', controllerName='lamps')
 
+        self.powerFilterwheel = SwitchMRow(self, 'filterwheel', 'Filterwheel', 0, '{:g}', controllerName='lamps')
         self.linewheel = ValueMRow(self, 'linewheel', 'Line Wheel', 1, '{:s}')
         self.qthwheel = ValueMRow(self, 'qthwheel', 'QTH Wheel', 1, '{:s}')
         self.adc1 = ValueMRow(self, 'adc', 'ADC 1', 0, '{:.4f}')

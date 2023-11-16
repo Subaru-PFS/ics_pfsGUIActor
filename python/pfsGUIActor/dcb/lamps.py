@@ -32,8 +32,8 @@ class SwitchLamp(SwitchButton):
 
 
 class LampsPanel(ControllerPanel):
-    lampNames1 = ['halogen', 'argon', 'hgar', 'neon', 'krypton']
-    lampNames2 = ['halogen', 'argon', 'hgar', 'neon', 'krypton', 'xenon']
+    lampNames1 = ['halogen', 'neon', 'hgar', 'argon', 'krypton', 'allFiberLamp']
+    lampNames2 = ['halogen', 'neon', 'hgar', 'argon', 'krypton', 'xenon']
 
     def __init__(self, controlDialog):
         self.addLamp = True
