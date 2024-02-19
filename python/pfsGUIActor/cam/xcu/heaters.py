@@ -1,8 +1,10 @@
 __author__ = 'alefur'
 
 from pfsGUIActor.cam import CamDevice
+from pfsGUIActor.common import ComboBox
 from pfsGUIActor.control import CommandsGB
-from pfsGUIActor.widgets import SwitchGB, ValuesRow, ValueGB, CustomedCmd, CmdButton, SpinBoxGB, SwitchButton
+from pfsGUIActor.widgets import SwitchGB, ValuesRow, ValueGB, CustomedCmd, CmdButton, SpinBoxGB, SwitchButton, \
+    DoubleSpinBoxGB
 
 
 class HeaterFraction(ValueGB):
@@ -30,10 +32,23 @@ class HeaterState(ValuesRow):
         ValuesRow.__init__(self, widgets, title=name.capitalize())
 
 
+class PidHeaterState(ValuesRow):
+    def __init__(self, controlPanel, heaterNumber, heaterName):
+        self.name = heaterName
+        heaterKey = f'heater{heaterNumber}'
+        widgets = [ValueGB(controlPanel.moduleRow, heaterKey, 'mode', 1, '{:s}'),
+                   ValueGB(controlPanel.moduleRow, heaterKey, 'tempSetpoint', 2, '{:.2f}'),
+                   ValueGB(controlPanel.moduleRow, heaterKey, 'powerSetpoint', 3, '{:.2f}'),
+                   ValueGB(controlPanel.moduleRow, heaterKey, 'fraction', 4, '{:.2f}'),
+                   ValueGB(controlPanel.moduleRow, heaterKey, 'temp', 5, '{:.2f}'),
+                   ]
+        ValuesRow.__init__(self, widgets, title=heaterName.capitalize())
+
+
 class HeatersPanel(CamDevice):
-    visNames = ['spreader', 'ccd']
-    nirNames = ['shield', 'spreader', 'asic', 'h4']
-    heaterNames = dict(b=visNames, r=visNames, n=nirNames)
+    hpHeaterNames = dict(b=['spreader'], r=['spreader'], n=['spreader', 'shield'])
+    pidHeaterNames = dict(b=['', 'ccd'], r=['', 'ccd'], n=['asic', 'h4'])
+
     heaterChannels = dict(ccd=4, spreader=5, asic=0, shield=1, h4=4)
 
     def __init__(self, controlDialog):
@@ -41,13 +56,23 @@ class HeatersPanel(CamDevice):
         self.addCommandSet(HeatersCommands(self))
 
     def createWidgets(self):
-        sortedChannels = dict(sorted(self.heaterChannels.items(), key=lambda kv: kv[1])).keys()
-        heaterNames = sortedChannels if False else self.heaterNames[self.moduleRow.camRow.arm]
-        self.heaters = [HeaterState(self, name) for name in heaterNames]
+        # sortedChannels = dict(sorted(self.heaterChannels.items(), key=lambda kv: kv[1])).keys()
+        self.hpHeaters = [HeaterState(self, name) for name in self.hpHeaterNames[self.moduleRow.camRow.arm]]
+
+        pidHeaters = []
+        for i, name in enumerate(self.pidHeaterNames[self.moduleRow.camRow.arm]):
+            if not name:
+                continue
+            pidHeaters.append(PidHeaterState(self, i + 1, name))
+
+        self.pidHeaters = pidHeaters
 
     def setInLayout(self):
-        for i, value in enumerate(self.heaters):
+        for i, value in enumerate(self.hpHeaters):
             self.grid.addWidget(value, i, 0)
+
+        for j, value in enumerate(self.pidHeaters):
+            self.grid.addWidget(value, i + j + 1, 0)
 
 
 class HPCmd(SwitchButton):
@@ -64,17 +89,36 @@ class HPCmd(SwitchButton):
         self.buttonOff.setVisible(not bool)
 
 
-class FracCmd(CustomedCmd):
+class PidCmd(CustomedCmd):
     def __init__(self, controlPanel, name):
         self.name = name
         CustomedCmd.__init__(self, controlPanel, buttonLabel='SET %s' % name.upper())
 
-        self.value = SpinBoxGB('Power(percent)', vmin=0, vmax=100)
-        self.addWidget(self.value, 0, 1)
+        self.combo = ComboBox()
+        self.combo.addItems(['TEMP', 'POWER'])
+        self.combo.currentIndexChanged.connect(self.showMode)
+
+        self.setpoint1 = DoubleSpinBoxGB('Temperature(K)', vmin=80, vmax=300, decimals=1)
+        self.setpoint1.setValue(100)
+        self.setpoint2 = SpinBoxGB('Power(percent)', vmin=0, vmax=100)
+
+        self.setpoint2.hide()
+
+        self.addWidget(self.combo, 0, 1)
+        self.addWidget(self.setpoint1, 0, 2)
+        self.addWidget(self.setpoint2, 0, 2)
 
     def buildCmd(self):
-        cmdHeaterName = 'ccd' if self.name == 'h4' else self.name
-        return '%s heaters %s power=%d' % (self.controlPanel.actorName, cmdHeaterName, self.value.getValue())
+        setpoint = f'temp={self.setpoint1.getValue():.1f}' if not self.combo.currentIndex() else f'power={self.setpoint2.getValue():d}'
+        return f'{self.controlPanel.actorName} heaters {self.name} {setpoint}'
+
+    def showMode(self, index):
+        if index == 0:
+            self.setpoint1.show()
+            self.setpoint2.hide()
+        else:
+            self.setpoint1.hide()
+            self.setpoint2.show()
 
 
 class HeatersCommands(CommandsGB):
@@ -84,9 +128,8 @@ class HeatersCommands(CommandsGB):
                                       cmdStr='%s heaters status' % controlPanel.actorName)
         self.grid.addWidget(self.statusButton, 0, 0)
 
-        for i, heater in enumerate(controlPanel.heaters):
-            name = heater.name
-            if name in ['spreader', 'shield']:
-                self.grid.addWidget(HPCmd(controlPanel, name), 1 + i, 0)
-            else:
-                self.grid.addLayout(FracCmd(controlPanel, name), 1 + i, 0)
+        for i, heater in enumerate(controlPanel.hpHeaters):
+            self.grid.addWidget(HPCmd(controlPanel, heater.name), 1 + i, 0)
+
+        for j, heater in enumerate(controlPanel.pidHeaters):
+            self.grid.addLayout(PidCmd(controlPanel, heater.name), 2 + i + j, 0)
