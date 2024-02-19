@@ -112,8 +112,8 @@ class CamRow(ModuleRow):
 
     @property
     def displayed(self):
-        return [self.actorStatus, self.xcu.cryoMode, self.detector.substate, self.xcu.temperature, self.xcu.pressure,
-                self.xcu.twoIonPumps]
+        return [self.actorStatus, self.xcu.cryoMode, self.detector.substate, self.xcu.pressure,
+                self.xcu.twoIonPumps] + self.xcu.temps
 
     @property
     def isNir(self):

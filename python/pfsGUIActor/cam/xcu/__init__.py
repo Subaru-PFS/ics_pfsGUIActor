@@ -1,7 +1,7 @@
 __author__ = 'alefur'
 addEng = False
 
-import numpy as np
+import pfsGUIActor.styles as styles
 from pfsGUIActor.cam.xcu.cooler import CoolerPanel
 from pfsGUIActor.cam.xcu.gatevalve import GVPanel
 from pfsGUIActor.cam.xcu.gauge import GaugePanel
@@ -15,7 +15,7 @@ from pfsGUIActor.cam.xcu.turbo import TurboPanel
 from pfsGUIActor.common import ComboBox, GridLayout
 from pfsGUIActor.control import ControlDialog, MultiplePanel, Topbar
 from pfsGUIActor.modulerow import ModuleRow
-from pfsGUIActor.widgets import Controllers, ValueMRow, CmdButton, CustomedCmd, ValueGB, SwitchMRow, SwitchGB, \
+from pfsGUIActor.widgets import Controllers, ValueMRow, CmdButton, CustomedCmd, SwitchMRow, SwitchGB, \
     ScientificNRow
 
 
@@ -47,33 +47,43 @@ class SetCryoMode(CustomedCmd):
         return cmdStr
 
 
-class DetectorTemp(ValueMRow):
-    def __init__(self, moduleRow):
-        ValueMRow.__init__(self, moduleRow, 'temps', 'Temperature(K)', 10, '{:g}', controllerName='temps')
+class PidTemp(ValueMRow):
+    tempChannels = dict(asic=9, h4=11, ccd=11)
+    heaterNumbers = dict(asic=1, h4=2, ccd=2)
 
-    def updateVals(self, ind, fmt, keyvar):
-        def checkInvalid(value):
-            try:
-                value = float(value)
-                if value >= 400:
-                    raise
-            except:
-                value = np.nan
+    def __init__(self, moduleRow, tempName):
+        self.tempName = tempName
+        tempChannel = self.tempChannels[tempName]
+        heaterNumber = self.heaterNumbers[tempName]
+        ValueMRow.__init__(self, moduleRow, 'temps', f'{tempName.upper()} Temp(K)', tempChannel, '{:.1f}',
+                           controllerName='temps')
 
-            return value
+        heaterKey = f'heater{heaterNumber}'
 
-        values = keyvar.getValue(doRaise=False)
+        self.mode = ValueMRow(moduleRow, heaterKey, 'mode', 1, '{:s}')
+        self.setpoint = ValueMRow(moduleRow, heaterKey, 'setpoint', 2, '{:.1f}')
 
-        temps = np.array([checkInvalid(values[i]) for i in [11]])
+    def setText(self, txt):
+        mode = self.mode.value.text()
 
-        try:
-            value = np.nanmean(temps)
-            strValue = fmt.format(value)
-        except TypeError:
-            strValue = 'nan'
+        if mode == 'TEMP':
+            txt = f'{self.setpoint.value.text()}|{txt}'
 
-        self.setText(strValue)
-        self.moduleRow.mwindow.heartBeat()
+        ValueMRow.setText(self, txt)
+
+    def getStyles(self, text):
+        mode = self.mode.value.text()
+
+        if mode == 'TEMP':
+            state = 'online'
+            self.setTitle(f'{self.tempName.upper()}(K) LOOP ON')
+        else:
+            state = 'default'
+            self.setTitle(f'{self.tempName.upper()} Temp(K)')
+
+        background, police = styles.colorWidget(state)
+
+        return background, police
 
 
 class SingleIonPump(SwitchGB):
@@ -114,13 +124,15 @@ class TwoIonPumps(SwitchMRow):
 
 
 class XcuRow(ModuleRow):
+    tempNames = dict(b=['ccd'], r=['ccd'], n=['h4', 'asic'])
+
     def __init__(self, camRow):
         self.camRow = camRow
         ModuleRow.__init__(self, module=camRow.module,
                            actorName='xcu_%s%i' % (camRow.arm, camRow.module.specNum), actorLabel='XCU')
 
         self.cryoMode = ValueMRow(self, 'cryoMode', 'cryoMode', 0, '{:s}', controllerName='')
-        self.temperature = DetectorTemp(self)
+        self.temps = [PidTemp(self, tempName) for tempName in self.tempNames[camRow.arm]]
         self.pressure = ScientificNRow(self, 'pressure', 'Pressure(Torr)', 0, '{:.5e}', controllerName='PCM')
         self.twoIonPumps = TwoIonPumps(self)
         self.controllers = Controllers(self)
@@ -128,7 +140,7 @@ class XcuRow(ModuleRow):
 
     @property
     def widgets(self):
-        return [self.cryoMode, self.temperature, self.pressure, self.twoIonPumps]
+        return [self.cryoMode, self.pressure, self.twoIonPumps] + self.temps
 
     def setOnline(self):
         ModuleRow.setOnline(self)
@@ -175,7 +187,7 @@ class XcuDialog(ControlDialog):
             coolingPanel.addWidget(cooler, i, 0)
 
         coolingPanel.addWidget(self.tempsPanel, i + 1, 0)
-        #coolingPanel.addWidget(self.heatersPanel, i + 2, 0)
+        # coolingPanel.addWidget(self.heatersPanel, i + 2, 0)
 
         self.tabWidget.addTab(self.pcmPanel, 'PCM')
         self.tabWidget.addTab(self.motorsPanel, 'Motors')
