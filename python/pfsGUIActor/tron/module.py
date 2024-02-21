@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QGroupBox, QLabel, QDial, QWidget
 from pfsGUIActor.common import GridLayout, HBoxLayout
 from pfsGUIActor.tron.alerts import AlertsRow
 from pfsGUIActor.widgets import ValueGB
-
+from pfsGUIActor.ait.module import AitStatus
 
 class TronDial(QDial):
     style = ''' QDial{background-color:QLinearGradient(x1: 0.177, y1: 0.004, x2: 0.831, y2: 0.911,  stop: 0 white,
@@ -37,14 +37,16 @@ class TronModule(QWidget):
 
         self.mwindow = mwindow
         self.tronStatus = TronStatus()
+        self.aitStatus = AitStatus(mwindow.aitModule)
         self.alertsRow = AlertsRow(self)
 
         hbox.addWidget(self.tronStatus)
+        hbox.addWidget(self.aitStatus)
         hbox.addWidget(self.alertsRow.status)
         self.setLayout(hbox)
 
     def setEnabled(self, bool):
-        for widget in [self.tronStatus, self.alertsRow]:
+        for widget in [self.tronStatus, self.aitStatus, self.alertsRow]:
             widget.setOnline(bool)
 
         self.adjustSize()

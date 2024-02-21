@@ -2,8 +2,12 @@ import pfsGUIActor.dcb as dcb
 import pfsGUIActor.lam.aten as lamAten
 import pfsGUIActor.lam.breva as lamBreva
 import pfsGUIActor.lam.sac as lamSac
+import pfsGUIActor.styles as styles
+from PyQt5.QtWidgets import QGroupBox
+from pfsGUIActor.common import GridLayout, Label, PushButton
 from pfsGUIActor.module import Module
 from pfsGUIActor.rough import RoughRow
+from pfsGUIActor.widgets import ValueGB
 
 
 class AitModule(Module):
@@ -35,3 +39,29 @@ class AitModule(Module):
     @property
     def rows(self):
         return self.dcbs + self.roughs + self.lamAITRows
+
+
+class AitStatus(ValueGB):
+    def __init__(self, aitModule):
+        QGroupBox.__init__(self)
+        self.setTitle('AIT')
+
+        self.grid = GridLayout()
+        self.grid.setContentsMargins(5, 0, 0, 0)
+
+        self.value = Label()
+        self.grid.addWidget(self.value, 0, 0)
+
+        self.button = PushButton()
+        self.button.setFlat(True)
+        self.button.clicked.connect(aitModule.showModule)
+        self.grid.addWidget(self.button, 0, 0)
+
+        self.setLayout(self.grid)
+
+    def setOnline(self, isOnline):
+        self.fontSize = styles.bigFont
+        text = 'ONLINE' if isOnline else 'OFFLINE'
+        key = text if isOnline else 'failed'
+        self.value.setText(text)
+        self.setColor(*styles.colorWidget(key))
