@@ -6,9 +6,9 @@ from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QSpacerItem, QSizePolicy
 from PyQt5.QtWidgets import QWidget, QMessageBox
 from pfsGUIActor.common import GridLayout
-from pfsGUIActor.module import AitModule, SpecModule, SpsModule, PfiModule
+from pfsGUIActor.module import SpecModule, SpsModule, PfiModule
 from pfsGUIActor.tron.module import TronModule
-
+from pfsGUIActor.ait.module import AitModule
 
 class PfsWidget(QWidget):
     def __init__(self, pfsGUI):

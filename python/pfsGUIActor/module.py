@@ -1,6 +1,5 @@
 __author__ = 'alefur'
 
-import pfsGUIActor.dcb as dcb
 import pfsGUIActor.styles as styles
 from PyQt5.QtWidgets import QGroupBox
 from pfsGUIActor.cam import CamRow
@@ -8,13 +7,9 @@ from pfsGUIActor.common import GridLayout
 from pfsGUIActor.enu import EnuRow
 from pfsGUIActor.pfi.peb import PebRow
 from pfsGUIActor.pfi.pfilamps import PfiLampsRow
-from pfsGUIActor.rough import RoughRow
 from pfsGUIActor.sps import SpecModuleRow
 
 # lam import
-import pfsGUIActor.lam.aten as lamAten
-import pfsGUIActor.lam.breva as lamBreva
-import pfsGUIActor.lam.sac as lamSac
 
 
 class Module(QGroupBox):
@@ -23,7 +18,7 @@ class Module(QGroupBox):
 
         self.fontSize = int(round(1.25 * styles.bigFont))
         self.grid = GridLayout()
-        self.grid.setContentsMargins(0, int(styles.bigFont*0.8), 0, 0)
+        self.grid.setContentsMargins(0, int(styles.bigFont * 0.8), 0, 0)
         self.grid.setSpacing(0)
 
         self.setLayout(self.grid)
@@ -52,41 +47,18 @@ class Module(QGroupBox):
 
         QGroupBox.setEnabled(self, a0)
 
+    def showModule(self):
+        if self.isVisible():
+            self.hide()
+        else:
+            self.show()
+
+        self.mwindow.adjustSize()
+
     def setStyleSheet(self, styleSheet=None):
         QGroupBox.setStyleSheet(self,
                                 "QGroupBox{ font-size: %ipx ;font-weight: bold; " % self.fontSize +
                                 "border: 1px solid lightgray;border-radius: 3px;margin-top: 6px;}")
-
-
-class AitModule(Module):
-    def __init__(self, mwindow):
-        Module.__init__(self, mwindow=mwindow, title='AIT')
-        actors = mwindow.actor.displayConfig['ait']
-
-        self.dcbs = []
-
-        if 'dcb' in actors:
-            self.dcbs += dcb.DcbRow(self).rows
-        if 'dcb2' in actors:
-            self.dcbs += dcb.DcbRow(self, 'dcb2').rows
-
-        lamAITRows = []
-        lamAITRows += lamAten.AtenRow(self).rows if 'aten' in actors else []
-        lamAITRows += [lamSac.SacRow(self)] if 'sac' in actors else []
-        lamAITRows += [lamBreva.BrevaRow(self)] if 'breva' in actors else []
-
-        self.lamAITRows = lamAITRows
-
-        roughs = ['rough1'] if 'rough1' in actors else []
-        roughs += (['rough2'] if 'rough2' in actors else [])
-
-        self.roughs = [RoughRow(self, rough) for rough in roughs]
-
-        self.populateLayout()
-
-    @property
-    def rows(self):
-        return self.dcbs + self.roughs + self.lamAITRows
 
 
 class SpsModule(Module):

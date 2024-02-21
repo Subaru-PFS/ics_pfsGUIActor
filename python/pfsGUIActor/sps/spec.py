@@ -33,16 +33,8 @@ class SpecLabel(ValueGB):
         self.setEnabled(isOnline=self.specName in specModules)
 
     def connect(self, specModule):
-        def showModule():
-            if self.specModule.isVisible():
-                self.specModule.hide()
-            else:
-                self.specModule.show()
-
-            self.specModule.mwindow.adjustSize()
-
         self.specModule = specModule
-        self.button.clicked.connect(showModule)
+        self.button.clicked.connect(specModule.showModule)
 
     def setEnabled(self, isOnline):
         if isOnline:
