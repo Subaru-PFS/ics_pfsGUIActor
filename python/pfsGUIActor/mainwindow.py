@@ -5,10 +5,11 @@ from functools import partial
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QSpacerItem, QSizePolicy
 from PyQt5.QtWidgets import QWidget, QMessageBox
+from pfsGUIActor.ait.module import AitModule
 from pfsGUIActor.common import GridLayout
 from pfsGUIActor.module import SpecModule, SpsModule, PfiModule
 from pfsGUIActor.tron.module import TronModule
-from pfsGUIActor.ait.module import AitModule
+
 
 class PfsWidget(QWidget):
     def __init__(self, pfsGUI):
@@ -23,31 +24,33 @@ class PfsWidget(QWidget):
         self.mainLayout.setSpacing(1)
         self.mainLayout.setContentsMargins(1, 1, 1, 1)
 
-        nCol = 4
-        # add spacer
-        self.mainLayout.addItem(QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.MinimumExpanding), 1, nCol - 1)
-
+        self.aitModule = AitModule(self)
         self.tronModule = TronModule(self)
-        self.mainLayout.addWidget(self.tronModule, 1, nCol - 1, 1, 1)
-
-        nRow = 2
-        self.mainLayout.addWidget(AitModule(self), nRow, 0, 1, nCol)
-        nRow += 1
         self.spsModule = SpsModule(self)
-        self.mainLayout.addWidget(self.spsModule, nRow, 0, 1, nCol)
 
+        # building each specModule based on config.
         for specNum in range(1, 12):
             if 'sm%d' % specNum not in self.actor.displayConfig.keys():
                 continue
 
-            nRow += 1
-
             specConfig = self.actor.displayConfig[f'sm{specNum}']
             self.specModules[specNum] = SpecModule(self, specNum=specNum, specConfig=specConfig)
-            self.mainLayout.addWidget(self.specModules[specNum], nRow, 0, 1, nCol)
+
+        # not the prettiest code you ever wrote but it works and is fairly clear.
+        iRow = 0
+        nCols = 4
+        # add spacer
+        self.mainLayout.addItem(QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.MinimumExpanding), iRow, nCols - 1)
+        self.mainLayout.addWidget(self.tronModule, iRow, nCols - 1, 1, 1)
+        iRow += 1
+
+        for module in [self.aitModule, self.spsModule] + list(self.specModules.values()):
+            self.mainLayout.addWidget(module, iRow, 0, 1, nCols)
+            iRow += 1
 
         if 'pfi' in self.actor.displayConfig.keys():
-            self.mainLayout.addWidget(PfiModule(self), nRow + 1, 0, 1, nCol)
+            self.mainLayout.addWidget(PfiModule(self), iRow + 1, 0, 1, nCols)
+            iRow += 1
 
         self.spsModule.connect(self.specModules)
         self.adjustSize()
