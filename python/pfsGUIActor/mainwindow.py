@@ -36,7 +36,7 @@ class PfsWidget(QWidget):
             specConfig = self.actor.displayConfig[f'sm{specNum}']
             self.specModules[specNum] = SpecModule(self, specNum=specNum, specConfig=specConfig)
 
-        # not the prettiest code you ever wrote but it works and is fairly clear.
+        # not the prettiest code you ever wrote, but it works and is fairly clear.
         iRow = 0
         nCols = 4
         # add spacer

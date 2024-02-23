@@ -32,13 +32,29 @@ class HeaterState(ValuesRow):
         ValuesRow.__init__(self, widgets, title=name.capitalize())
 
 
-class PidHeaterState(ValuesRow):
+class PidHeaterState(ValueGB):
+    def __init__(self, controlPanel, heaterKey):
+        ValueGB.__init__(self, controlPanel.moduleRow, heaterKey, 'state', 4, '{:.2f}')
+
+    def setText(self, text):
+        def stateFromValue(text):
+            value = float(text)
+            text = 'ON' if value > 0 else 'OFF'
+            return text
+
+        text = stateFromValue(text) if text != 'nan' else text
+
+        ValueGB.setText(self, text)
+
+
+class PidHeaterStatus(ValuesRow):
     def __init__(self, controlPanel, heaterNumber, heaterName):
         self.name = heaterName
         heaterKey = f'heater{heaterNumber}'
-        widgets = [ValueGB(controlPanel.moduleRow, heaterKey, 'mode', 1, '{:s}'),
-                   ValueGB(controlPanel.moduleRow, heaterKey, 'tempSetpoint', 2, '{:.2f}'),
-                   ValueGB(controlPanel.moduleRow, heaterKey, 'powerSetpoint', 3, '{:.2f}'),
+        widgets = [PidHeaterState(controlPanel, heaterKey),
+                   ValueGB(controlPanel.moduleRow, heaterKey, 'mode', 1, '{:s}'),
+                   ValueGB(controlPanel.moduleRow, heaterKey, 'temp setPoint', 2, '{:.2f}'),
+                   ValueGB(controlPanel.moduleRow, heaterKey, 'power setPoint', 3, '{:.2f}'),
                    ValueGB(controlPanel.moduleRow, heaterKey, 'fraction', 4, '{:.2f}'),
                    ValueGB(controlPanel.moduleRow, heaterKey, 'temp', 5, '{:.2f}'),
                    ]
@@ -63,7 +79,7 @@ class HeatersPanel(CamDevice):
         for i, name in enumerate(self.pidHeaterNames[self.moduleRow.camRow.arm]):
             if not name:
                 continue
-            pidHeaters.append(PidHeaterState(self, i + 1, name))
+            pidHeaters.append(PidHeaterStatus(self, i + 1, name))
 
         self.pidHeaters = pidHeaters
 
