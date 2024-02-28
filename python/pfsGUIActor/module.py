@@ -2,14 +2,13 @@ __author__ = 'alefur'
 
 import pfsGUIActor.styles as styles
 from PyQt5.QtWidgets import QGroupBox
+from PyQt5.QtWidgets import QSpacerItem, QSizePolicy
 from pfsGUIActor.cam import CamRow
 from pfsGUIActor.common import GridLayout
 from pfsGUIActor.enu import EnuRow
 from pfsGUIActor.pfi.peb import PebRow
 from pfsGUIActor.pfi.pfilamps import PfiLampsRow
 from pfsGUIActor.sps import SpecModuleRow
-
-# lam import
 
 
 class Module(QGroupBox):
@@ -100,6 +99,15 @@ class SpecModule(Module):
         self.parts = parts
 
         self.populateLayout()
+
+        # just align better when they are no NIR camera.
+        iColMax = self.grid.columnCount() - 1
+
+        for iRow in range(self.grid.rowCount()):
+            item = self.grid.itemAtPosition(iRow, iColMax)
+
+            if item is None:
+                self.grid.addItem(QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Minimum), iRow, iColMax)
 
     @property
     def rows(self):

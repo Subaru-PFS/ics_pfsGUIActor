@@ -52,7 +52,7 @@ class PidHeaterStatus(ValuesRow):
         self.name = heaterName
         heaterKey = f'heater{heaterNumber}'
         widgets = [PidHeaterState(controlPanel, heaterKey),
-                   ValueGB(controlPanel.moduleRow, heaterKey, 'mode', 1, '{:s}'),
+                   ValueGB(controlPanel.moduleRow, heaterKey, 'loopMode', 1, '{:s}'),
                    ValueGB(controlPanel.moduleRow, heaterKey, 'temp setPoint', 2, '{:.2f}'),
                    ValueGB(controlPanel.moduleRow, heaterKey, 'power setPoint', 3, '{:.2f}'),
                    ValueGB(controlPanel.moduleRow, heaterKey, 'fraction', 4, '{:.2f}'),
