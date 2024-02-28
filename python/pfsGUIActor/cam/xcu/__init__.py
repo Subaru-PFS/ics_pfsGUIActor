@@ -2,6 +2,7 @@ __author__ = 'alefur'
 addEng = False
 
 import pfsGUIActor.styles as styles
+from PyQt5.QtWidgets import QProgressBar
 from pfsGUIActor.cam.xcu.cooler import CoolerPanel
 from pfsGUIActor.cam.xcu.gatevalve import GVPanel
 from pfsGUIActor.cam.xcu.gauge import GaugePanel
@@ -47,6 +48,31 @@ class SetCryoMode(CustomedCmd):
         return cmdStr
 
 
+class HeaterBar(QProgressBar):
+    defaultColor = '#2196F3'
+    warningThreshold = 0.8
+
+    def __init__(self, parent):
+        QProgressBar.__init__(self, parent)
+        self.setStyleSheet("QProgressBar {background-color: rgba(0, 0, 0, 0);color:white;text-align: center; }")
+
+        self.setRange(0, 100)
+
+        self.setMaximumHeight(12)
+
+    def updateValue(self, fraction, temperature, setpoint):
+        self.setValue(float(fraction) * 100)
+        self.setFormat(f'{setpoint}|{temperature}')
+
+        # if float(fraction)>self.warningThreshold:
+        #     self.setStyleSheet("QProgressBar {background-color: white;color:white;text-align: center; }"
+        #                        "QProgressBar::chunk {background-color: orangered};")
+        #
+        # else:
+        #     self.setStyleSheet("QProgressBar {background-color: white;color:white;text-align: center; }"
+        #                        f"QProgressBar::chunk {{background-color: {self.defaultColor}}};")
+
+
 class PidTemp(ValueMRow):
     tempChannels = dict(asic=9, h4=11, ccd=11)
     heaterNumbers = dict(asic=1, h4=2, ccd=2)
@@ -62,12 +88,24 @@ class PidTemp(ValueMRow):
 
         self.mode = ValueMRow(moduleRow, heaterKey, 'mode', 1, '{:s}')
         self.setpoint = ValueMRow(moduleRow, heaterKey, 'setpoint', 2, '{:.1f}')
+        self.fraction = ValueMRow(moduleRow, heaterKey, 'setpoint', 4, '{:.1f}')
+
+        self.progressBar = HeaterBar(self)
+        self.progressBar.hide()
+        self.grid.addWidget(self.progressBar, 0, 0)
 
     def setText(self, txt):
         mode = self.mode.value.text()
 
         if mode == 'TEMP':
-            txt = f'{self.setpoint.value.text()}|{txt}'
+            self.value.hide()
+            self.progressBar.show()
+            self.progressBar.updateValue(self.fraction.value.text(),
+                                         self.value.text(),
+                                         self.setpoint.value.text())
+        else:
+            self.value.show()
+            self.progressBar.hide()
 
         ValueMRow.setText(self, txt)
 
