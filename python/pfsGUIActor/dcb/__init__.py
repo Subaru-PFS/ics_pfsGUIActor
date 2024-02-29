@@ -5,6 +5,7 @@ from pfsGUIActor.dcb.collimator import CollimatorPanel
 from pfsGUIActor.dcb.filterwheel import FilterwheelPanel
 from pfsGUIActor.dcb.lamps import LampsPanel
 from pfsGUIActor.enu import ConnectCmd
+from pfsGUIActor.lampUtils import getLampLabel
 from pfsGUIActor.modulerow import ModuleRow, RowWidget
 from pfsGUIActor.widgets import ValueMRow, SwitchMRow, Controllers
 
@@ -47,9 +48,11 @@ class RowTwo(RowWidget):
         dcbRow = self.moduleRow
 
         if dcbRow.actorName == 'dcb':
-            lamps = [dcbRow.qth, dcbRow.neon, dcbRow.hgar, dcbRow.argon, dcbRow.krypton, dcbRow.allFiberLamp]
+            lamps = [dcbRow.lamps['halogen'], dcbRow.lamps['neon'], dcbRow.lamps['hgar'], dcbRow.lamps['argon'],
+                     dcbRow.lamps['krypton'], dcbRow.lamps['allFiberLamp']]
         else:
-            lamps = [dcbRow.qth, dcbRow.neon, dcbRow.hgar, dcbRow.argon, dcbRow.krypton, dcbRow.xenon]
+            lamps = [dcbRow.lamps['halogen'], dcbRow.lamps['neon'], dcbRow.lamps['hgar'], dcbRow.lamps['argon'],
+                     dcbRow.lamps['krypton'], dcbRow.lamps['xenon']]
 
         return lamps
 
@@ -59,19 +62,17 @@ class RowTwo(RowWidget):
 
 
 class DcbRow(ModuleRow):
+    lampKeys = ['hgar', 'neon', 'krypton', 'argon', 'xenon', 'halogen', 'allFiberLamp']
+
     def __init__(self, spsModule, name='dcb'):
         ModuleRow.__init__(self, module=spsModule, actorName=name, actorLabel=name.upper())
 
         self.state = ValueMRow(self, 'metaFSM', '', 0, '{:s}')
         self.substate = ValueMRow(self, 'metaFSM', '', 1, '{:s}')
 
-        self.hgar = SwitchMRow(self, 'hgar', 'Hg-Ar', 0, '{:g}', controllerName='lamps')
-        self.neon = SwitchMRow(self, 'neon', 'Neon', 0, '{:g}', controllerName='lamps')
-        self.krypton = SwitchMRow(self, 'krypton', 'Krypton', 0, '{:g}', controllerName='lamps')
-        self.argon = SwitchMRow(self, 'argon', 'Argon', 0, '{:g}', controllerName='lamps')
-        self.xenon = SwitchMRow(self, 'xenon', 'Xenon', 0, '{:g}', controllerName='lamps')
-        self.qth = SwitchMRow(self, 'halogen', 'QTH', 0, '{:g}', controllerName='lamps')
-        self.allFiberLamp = SwitchMRow(self, 'allFiberLamp', 'allFiberLamp', 0, '{:g}', controllerName='lamps')
+        self.lamps = dict(
+            [(lampKey, SwitchMRow(self, lampKey, getLampLabel(lampKey), 0, '{:g}', controllerName='lamps')) for lampKey
+             in self.lampKeys])
 
         self.powerFilterwheel = SwitchMRow(self, 'filterwheel', 'Filterwheel', 0, '{:g}', controllerName='lamps')
         self.linewheel = ValueMRow(self, 'linewheel', 'Line Wheel', 1, '{:s}')

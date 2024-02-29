@@ -3,7 +3,7 @@ __author__ = 'alefur'
 from pfsGUIActor.control import ControllerPanel
 from pfsGUIActor.enu import EnuDeviceCmd
 from pfsGUIActor.widgets import ValueGB, SwitchGB, SwitchButton
-
+from pfsGUIActor.lampUtils import getLampLabel
 
 # class LampNames(ValueGB):
 #     def __init__(self, lampsPanel):
@@ -56,8 +56,8 @@ class LampsPanel(ControllerPanel):
         self.grid.addWidget(self.state, 0, 1)
         self.grid.addWidget(self.substate, 0, 2)
 
-        for i, lampName in enumerate(self.lampNames):
-            self.grid.addWidget(SwitchGB(self.moduleRow, lampName, lampName.capitalize(), 0, '{:g}'), 1 + i, 0)
+        for i, lampKey in enumerate(self.lampNames):
+            self.grid.addWidget(SwitchGB(self.moduleRow, lampKey, getLampLabel(lampKey), 0, '{:g}'), 1 + i, 0)
 
 
 class LampsCommands(EnuDeviceCmd):
