@@ -372,7 +372,7 @@ class CustomedCmd(GridLayout):
 class Controllers(ValueGB):
     def __init__(self, moduleRow):
         ValueGB.__init__(self, moduleRow, 'controllers', 'Controllers', 0, '{:s}', fontSize=styles.bigFont)
-        QTimer.singleShot(5000, self.updateWidgets)
+        QTimer.singleShot(10000, self.updateWidgets)
 
     def updateVals(self, ind, fmt, keyvar):
         self.updateWidgets(keyvar.getValue(doRaise=False))
