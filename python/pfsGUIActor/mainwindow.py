@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QSpacerItem, QSizePolicy
 from PyQt5.QtWidgets import QWidget, QMessageBox
 from pfsGUIActor.ait.module import AitModule
 from pfsGUIActor.common import GridLayout
-from pfsGUIActor.module import SpecModule, SpsModule, PfiModule
+from pfsGUIActor.module import SpecModule, OperationModule, PfiModule
 from pfsGUIActor.tron.module import TronModule
 
 
@@ -26,7 +26,7 @@ class PfsWidget(QWidget):
 
         self.aitModule = AitModule(self)
         self.tronModule = TronModule(self)
-        self.spsModule = SpsModule(self)
+        self.operationModule = OperationModule(self)
 
         # building each specModule based on config.
         for specNum in range(1, 12):
@@ -44,7 +44,7 @@ class PfsWidget(QWidget):
         self.mainLayout.addWidget(self.tronModule, iRow, nCols - 1, 1, 1)
         iRow += 1
 
-        for module in [self.aitModule, self.spsModule] + list(self.specModules.values()):
+        for module in [self.aitModule, self.operationModule] + list(self.specModules.values()):
             self.mainLayout.addWidget(module, iRow, 0, 1, nCols)
             iRow += 1
 
@@ -52,7 +52,7 @@ class PfsWidget(QWidget):
             self.mainLayout.addWidget(PfiModule(self), iRow + 1, 0, 1, nCols)
             iRow += 1
 
-        self.spsModule.connect(self.specModules)
+        self.operationModule.connect(self.specModules)
         self.adjustSize()
 
     @property
