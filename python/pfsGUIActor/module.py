@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QSpacerItem, QSizePolicy
 from pfsGUIActor.cam import CamRow
 from pfsGUIActor.common import GridLayout
 from pfsGUIActor.enu import EnuRow
+from pfsGUIActor.iic import IicRow
 from pfsGUIActor.pfi.peb import PebRow
 from pfsGUIActor.pfi.pfilamps import PfiLampsRow
 from pfsGUIActor.sps import SpecModuleRow
@@ -60,23 +61,24 @@ class Module(QGroupBox):
                                 "border: 1px solid lightgray;border-radius: 3px;margin-top: 6px;}")
 
 
-class SpsModule(Module):
+class OperationModule(Module):
     def __init__(self, mwindow):
         Module.__init__(self, mwindow=mwindow, title='')
 
-        self.row = SpecModuleRow(self)
+        self.iicRow = IicRow(self)
+        self.spsRow = SpecModuleRow(self)
 
         self.populateLayout()
         self.grid.setContentsMargins(0, 0, 0, 0)
 
     @property
     def rows(self):
-        return [self.row]
+        return self.iicRow.rows + [self.spsRow]
 
     def connect(self, specModules):
         """"""
         for specNum, specModule in specModules.items():
-            for specLabel in self.row.specLabels:
+            for specLabel in self.spsRow.specLabels:
                 if specNum == specLabel.specNum:
                     specLabel.connect(specModule)
 
