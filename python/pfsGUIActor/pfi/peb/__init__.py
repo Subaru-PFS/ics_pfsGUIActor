@@ -1,16 +1,25 @@
 __author__ = 'alefur'
 
 import pfsGUIActor.styles as styles
-from PyQt5.QtWidgets import QGridLayout
-from pfsGUIActor.common import ComboBox
-from pfsGUIActor.control import ControlPanel, CommandsGB, ControlDialog,MultiplePanel
+from pfsGUIActor.control import ControlDialog
 from pfsGUIActor.modulerow import ModuleRow
 from pfsGUIActor.pfi.peb.flow import FlowPanel
 from pfsGUIActor.pfi.peb.led import LedPanel
 from pfsGUIActor.pfi.peb.power import PowerPanel
 from pfsGUIActor.pfi.peb.temps import TempsPanel
-from pfsGUIActor.widgets import Coordinates, SwitchGB, DoubleSpinBoxGB, CustomedCmd, CmdButton, ValueMRow, Controllers, \
-    ValueGB, SwitchMRow
+from pfsGUIActor.pfi.peb.pfi import PfiPanel
+from pfsGUIActor.widgets import SwitchGB, ValueMRow, Controllers, \
+    SwitchMRow
+
+
+class RouterStatus(ValueMRow):
+    def __init__(self, moduleRow):
+        ValueMRow.__init__(self, moduleRow, 'pfi_status', 'Router', 0, '{:s}')
+
+    def setText(self, txt):
+        txt = 'ONLINE' if 'online' in txt else 'OFFLINE'
+        self.value.setText(txt)
+        self.customize()
 
 
 class SingleAGC(SwitchGB):
@@ -37,6 +46,7 @@ class AGCPower(SwitchMRow):
         self.value.setText(txt)
         self.customize()
 
+
 class LedPower(ValueMRow):
     def __init__(self, moduleRow):
         ValueMRow.__init__(self, moduleRow, 'dutycycle', 'LED Power(%)', 0, '{:g}')
@@ -48,10 +58,12 @@ class LedPower(ValueMRow):
         self.setColor(background=background, police=police)
         self.setEnabled(self.moduleRow.isOnline)
 
+
 class PebRow(ModuleRow):
     def __init__(self, module):
         ModuleRow.__init__(self, module=module, actorName='peb', actorLabel='PEB')
 
+        self.routerStatus = RouterStatus(self)
         self.agcPower = AGCPower(self)
         self.ledPower = LedPower(self)
 
@@ -60,7 +72,7 @@ class PebRow(ModuleRow):
 
     @property
     def widgets(self):
-        return [self.agcPower, self.ledPower]
+        return [self.routerStatus, self.agcPower, self.ledPower]
 
 
 class PebDialog(ControlDialog):
@@ -70,6 +82,7 @@ class PebDialog(ControlDialog):
         self.tempsPanel = TempsPanel(self)
         self.powerPanel = PowerPanel(self)
         self.ledPanel = LedPanel(self)
+        self.pfiPanel = PfiPanel(self)
 
         # telemetryPanel = MultiplePanel(self)
         # telemetryPanel.addWidget(self.flowPanel, 0, 0, 1, 1)
@@ -79,9 +92,8 @@ class PebDialog(ControlDialog):
         self.tabWidget.addTab(self.ledPanel, 'LED')
         self.tabWidget.addTab(self.flowPanel, 'FLow')
         self.tabWidget.addTab(self.tempsPanel, 'Temps')
-       # self.tabWidget.addTab(telemetryPanel, 'Telemetry')
-
-
+        self.tabWidget.addTab(self.pfiPanel, 'Pfi')
+    # self.tabWidget.addTab(telemetryPanel, 'Telemetry')
 
     # @property
     # def pannels(self):
