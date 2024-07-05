@@ -24,7 +24,7 @@ class PFSGUI(QMainWindow):
         self.setCentralWidget(self.pfsWidget)
 
         self.show()
-        self.move(self.screenWidth * 0.1, self.screenHeight * 0.1)
+        #self.move(self.screenWidth * 0.1, self.screenHeight * 0.1)
         self.setConnected(False)
 
     def setConnected(self, isConnected):

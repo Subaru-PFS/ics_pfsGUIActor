@@ -61,7 +61,7 @@ class HeaterBar(QProgressBar):
         self.setMaximumHeight(12)
 
     def updateValue(self, fraction, temperature, setpoint):
-        self.setValue(float(fraction) * 100)
+        self.setValue(int(round(float(fraction) * 100)))
         self.setFormat(f'{setpoint}|{temperature}')
 
         # if float(fraction)>self.warningThreshold:
