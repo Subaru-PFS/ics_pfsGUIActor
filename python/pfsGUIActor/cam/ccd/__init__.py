@@ -25,7 +25,7 @@ class ReadRows(QProgressBar):
         except ValueError:
             val = 0
 
-        self.setValue(val)
+        self.setValue(int(val))
 
     def resetValue(self):
         self.hide()

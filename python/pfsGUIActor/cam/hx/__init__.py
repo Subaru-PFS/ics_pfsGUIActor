@@ -54,7 +54,7 @@ class RampProgress(QProgressBar):
             self.setValue(0)
             return
 
-        self.setValue(read)
+        self.setValue(int(read))
 
         if group == 0 and read == self.nreset:
             self.setRange(0, self.nread)

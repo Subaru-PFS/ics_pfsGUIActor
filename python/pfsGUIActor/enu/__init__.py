@@ -48,7 +48,7 @@ class ElapsedTime(QProgressBar):
 
     def setExptime(self, keyvar):
         try:
-            exptime = keyvar.getValue()
+            exptime = int(round(keyvar.getValue()))
         except ValueError:
             return
 
@@ -56,7 +56,7 @@ class ElapsedTime(QProgressBar):
 
     def updateBar(self, keyvar):
         try:
-            val = keyvar.getValue()
+            val = int(round(keyvar.getValue()))
         except ValueError:
             val = 0
 
