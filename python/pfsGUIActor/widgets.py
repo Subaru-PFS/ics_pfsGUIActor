@@ -354,11 +354,12 @@ class EnumGB(ValueGB):
 
 
 class CustomedCmd(GridLayout):
-    def __init__(self, controlPanel, buttonLabel, safetyCheck=False):
+    def __init__(self, controlPanel, buttonLabel, safetyCheck=False, doAddButton=True):
         GridLayout.__init__(self)
         self.controlPanel = controlPanel
         self.button = InnerButton(self, label=buttonLabel, safetyCheck=safetyCheck)
-        self.addWidget(self.button, 0, 0)
+        if doAddButton:
+            self.addWidget(self.button, 0, 0)
 
     def buildCmd(self):
         pass
