@@ -60,7 +60,7 @@ class PushButton(QPushButton):
         if self.mPixmap is not None:
             y = (self.height() - self.mPixmap.height()) / 2
             painter = QPainter(self)
-            painter.drawPixmap(5, y, self.mPixmap)
+            painter.drawPixmap(5, int(round(y)), self.mPixmap)
 
 
 class ComboBox(QComboBox):
