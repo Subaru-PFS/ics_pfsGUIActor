@@ -108,7 +108,10 @@ class HPCmd(SwitchButton):
 class PidCmd(CustomedCmd):
     def __init__(self, controlPanel, name):
         self.name = name
-        CustomedCmd.__init__(self, controlPanel, buttonLabel='SET %s' % name.upper())
+        CustomedCmd.__init__(self, controlPanel, buttonLabel='SET %s' % name.upper(), doAddButton=False)
+
+        self.turnOff = CmdButton(controlPanel=controlPanel, label='TURN OFF',
+                                  cmdStr=f'{controlPanel.actorName} heaters {name} off')
 
         self.combo = ComboBox()
         self.combo.addItems(['TEMP', 'POWER'])
@@ -120,9 +123,11 @@ class PidCmd(CustomedCmd):
 
         self.setpoint2.hide()
 
-        self.addWidget(self.combo, 0, 1)
-        self.addWidget(self.setpoint1, 0, 2)
-        self.addWidget(self.setpoint2, 0, 2)
+        self.addWidget(self.turnOff, 0, 0)
+        self.addWidget(self.button, 0, 1)
+        self.addWidget(self.combo, 0, 2)
+        self.addWidget(self.setpoint1, 0, 3)
+        self.addWidget(self.setpoint2, 0, 3)
 
     def buildCmd(self):
         setpoint = f'temp={self.setpoint1.getValue():.1f}' if not self.combo.currentIndex() else f'power={self.setpoint2.getValue():d}'
