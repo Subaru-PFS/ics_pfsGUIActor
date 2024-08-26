@@ -31,9 +31,34 @@ from pfsGUIActor.enu.shutters import ShuttersPanel
 from pfsGUIActor.enu.slit import SlitPanel
 from pfsGUIActor.enu.temps import TempsPanel
 from pfsGUIActor.modulerow import ModuleRow
-from pfsGUIActor.widgets import CmdButton, ValueMRow, Controllers, CustomedCmd
+from pfsGUIActor.widgets import CmdButton, ValueMRow, Controllers, CustomedCmd, SwitchMRow
 from pfsGUIActor.common import ComboBox, GridLayout
 import pfsGUIActor.styles as styles
+
+
+class IisCombined(SwitchMRow):
+    lamps = ['halogen', 'neon', 'argon', 'krypton']
+
+    def __init__(self, moduleRow):
+        class SingleIisLamp(SwitchMRow):
+            def __init__(self, iisCombined, lampName):
+                self.iisCombined = iisCombined
+                SwitchMRow.__init__(self, iisCombined.moduleRow, lampName, lampName, 0, '{:g}', controllerName='iis')
+
+            def setText(self, txt):
+                SwitchMRow.setText(self, txt)
+                self.iisCombined.setText(txt)
+
+        SwitchMRow.__init__(self, moduleRow, 'argon', 'IIS', 0, '{:g}')
+
+        self.lamps = [SingleIisLamp(self, lamp) for lamp in IisCombined.lamps]
+
+    def setText(self, txt):
+        states = [lamp.value.text() for lamp in self.lamps]
+        state = 'ON' if any([state == 'ON' for state in states]) else 'OFF'
+
+        self.value.setText(state)
+        self.customize()
 
 
 class ElapsedTime(QProgressBar):
@@ -99,6 +124,7 @@ class EnuRow(ModuleRow):
         self.slit = ValueMRow(self, 'slitPosition', 'Slit', 0, '{:s}', controllerName='slit')
         self.shutters = ValueMRow(self, 'shutters', 'Shutters', 0, '{:s}', controllerName='biasha')
         self.bia = ValueMRow(self, 'bia', 'BIA', 0, '{:s}', controllerName='biasha')
+        self.iis = IisCombined(self)
 
         self.controllers = Controllers(self)
 
@@ -106,7 +132,7 @@ class EnuRow(ModuleRow):
 
     @property
     def widgets(self):
-        return [self.state, self.substate, self.rexm, self.slit, self.shutters, self.bia]
+        return [self.state, self.substate, self.rexm, self.slit, self.shutters, self.bia, self.iis]
 
 
 class ConnectButton(CmdButton):
