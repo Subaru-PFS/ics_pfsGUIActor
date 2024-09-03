@@ -61,6 +61,20 @@ class IisCombined(SwitchMRow):
         self.customize()
 
 
+class BiaStatus(ValueMRow):
+    def __init__(self, enuRow):
+        ValueMRow.__init__(self, enuRow, 'bia', 'BIA', 0, '{:s}', controllerName='biasha')
+
+    def setText(self, txt):
+        try:
+            strobeOn, _, _, _, = self.moduleRow.keyVarDict['biaConfig'].getValue()
+            txt = 'strobe' if int(strobeOn) and txt == 'on' else txt
+        except ValueError:
+            pass
+
+        ValueMRow.setText(self, txt)
+
+
 class ElapsedTime(QProgressBar):
     def __init__(self, enuRow):
         QProgressBar.__init__(self)
@@ -123,7 +137,7 @@ class EnuRow(ModuleRow):
         self.rexm = ValueMRow(self, 'rexm', 'Red Resolution', 0, '{:s}', controllerName='rexm')
         self.slit = ValueMRow(self, 'slitPosition', 'Slit', 0, '{:s}', controllerName='slit')
         self.shutters = ValueMRow(self, 'shutters', 'Shutters', 0, '{:s}', controllerName='biasha')
-        self.bia = ValueMRow(self, 'bia', 'BIA', 0, '{:s}', controllerName='biasha')
+        self.bia = BiaStatus(self)
         self.iis = IisCombined(self)
 
         self.controllers = Controllers(self)
