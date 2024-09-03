@@ -217,6 +217,7 @@ state2color = {"default": ('window', 'black'),
                "orangered": ('orangered', 'white'),
                "monitoring": ('skyblue', 'white'),
                "undefined": ('red', 'white'),
+               "strobe": ('skyblue', 'white'),
                }
 
 
