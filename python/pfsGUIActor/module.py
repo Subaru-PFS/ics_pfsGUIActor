@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QSpacerItem, QSizePolicy
 from pfsGUIActor.cam import CamRow
 from pfsGUIActor.common import GridLayout
 from pfsGUIActor.enu import EnuRow
+from pfsGUIActor.gen2 import Gen2Row
 from pfsGUIActor.iic import IicRow
 from pfsGUIActor.pfi.peb import PebRow
 from pfsGUIActor.pfi.pfilamps import PfiLampsRow
@@ -65,6 +66,7 @@ class OperationModule(Module):
     def __init__(self, mwindow):
         Module.__init__(self, mwindow=mwindow, title='')
 
+        self.gen2Row = Gen2Row(self)
         self.iicRow = IicRow(self)
         self.spsRow = SpecModuleRow(self)
 
@@ -73,7 +75,7 @@ class OperationModule(Module):
 
     @property
     def rows(self):
-        return self.iicRow.rows + [self.spsRow]
+        return [self.gen2Row] + self.iicRow.rows + [self.spsRow]
 
     def connect(self, specModules):
         """"""
