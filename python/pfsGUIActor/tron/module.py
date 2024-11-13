@@ -2,10 +2,12 @@ __author__ = 'alefur'
 
 import pfsGUIActor.styles as styles
 from PyQt5.QtWidgets import QGroupBox, QLabel, QDial, QWidget
+from pfsGUIActor.ait.module import AitStatus
 from pfsGUIActor.common import GridLayout, HBoxLayout
 from pfsGUIActor.tron.alerts import AlertsRow
+from pfsGUIActor.tron.obsWarnings import WarningsRow
 from pfsGUIActor.widgets import ValueGB
-from pfsGUIActor.ait.module import AitStatus
+
 
 class TronDial(QDial):
     style = ''' QDial{background-color:QLinearGradient(x1: 0.177, y1: 0.004, x2: 0.831, y2: 0.911,  stop: 0 white,
@@ -39,10 +41,12 @@ class TronModule(QWidget):
         self.tronStatus = TronStatus()
         self.aitStatus = AitStatus(mwindow.aitModule)
         self.alertsRow = AlertsRow(self)
+        self.warningsRow = WarningsRow(self)
 
         hbox.addWidget(self.tronStatus)
         hbox.addWidget(self.aitStatus)
         hbox.addWidget(self.alertsRow.status)
+        hbox.addWidget(self.warningsRow.status)
         self.setLayout(hbox)
 
     def setEnabled(self, bool):

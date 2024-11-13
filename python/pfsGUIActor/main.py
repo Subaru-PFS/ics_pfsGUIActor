@@ -80,8 +80,10 @@ def main():
     lam = ['aten', 'sac', 'breva']
     sps = ['sps', 'dcb', 'dcb2', 'rough1', 'rough2']
     pfi = ['peb', 'pfilamps']
+    drp = ['drp', 'drp2']
 
-    actor = miniActor.connectActor(['hub', 'alerts', 'iic', 'gen2'] + lam + sps + enus + xcus + ccds + hxs + pfi)
+    actor = miniActor.connectActor(['hub', 'alerts', 'iic', 'tests', 'gen2'] + lam + sps + enus + xcus + ccds + hxs + pfi + drp)
+
 
     try:
         ex = PFSGUI(reactor, actor, args.name, screen)
