@@ -10,6 +10,7 @@ import pfsGUIActor.tron.obsWarnings.warningFactory as warningFactory
 from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QFont, QTextCursor
 from PyQt5.QtWidgets import QPlainTextEdit, QMenu
+from pfsGUIActor.common import TabWidget
 from pfsGUIActor.control import ControlDialog, ControlPanel
 from pfsGUIActor.logs import CmdLogArea
 from pfsGUIActor.modulerow import ModuleRow
@@ -138,16 +139,35 @@ class WarningsRow(ModuleRow):
 
     def updateStatus(self):
         """Check and update warning status for all panels."""
-        anyWarning = any(p.warningBuffer.any() for p in self.controlDialog.pannels)
+        anyWarning = any(p.warningBuffer.any() for p in self.controlDialog.panels)
         self.status.setStatus(anyWarning)
 
 
-class WarningBuffer(QPlainTextEdit):
-    """Buffer to display, manage, and clear warnings."""
-
+class WarningBuffer(TabWidget):
     def __init__(self, controlPanel):
         super().__init__()
         self.controlPanel = controlPanel
+
+        self.current = CurrentWarningBuffer(self)
+        self.cleared = ClearedWarningBuffer(self)
+
+        self.addTab(self.current, 'Current')
+        self.addTab(self.cleared, 'Cleared')
+
+    def any(self):
+        return self.current.any()
+
+    def scream(self, *args, **kwargs):
+        return self.current.scream(*args, **kwargs)
+
+
+class CurrentWarningBuffer(QPlainTextEdit):
+    """Buffer to display, manage, and clear warnings."""
+
+    def __init__(self, tabWidget, isPrimary=True):
+        super().__init__()
+        self.tabWidget = tabWidget
+        self.isPrimary = isPrimary
         self.warnings = []  # Stores warning lines
 
         # UI setup
@@ -156,6 +176,10 @@ class WarningBuffer(QPlainTextEdit):
         self.setReadOnly(True)
         self.setStyleSheet("background-color: black; color: white;")
         self.setFont(QFont("Monospace", styles.smallFont))
+
+    @property
+    def controlPanel(self):
+        return self.tabWidget.controlPanel
 
     def newLine(self, status, message):
         """Add a warning with timestamp and formatted color."""
@@ -189,29 +213,53 @@ class WarningBuffer(QPlainTextEdit):
 
     def doClear(self, singleLine=False):
         """Remove specific or all warning lines."""
-        if not singleLine:
-            self.warnings = []
-        else:
-            cleanedLine = singleLine.strip()
-            self.warnings = [w for w in self.warnings if w != cleanedLine]
+        # Determine lines to clear
+        clearLines = [singleLine.strip()] if singleLine else self.warnings.copy()
+
+        # Remove lines safely
+        for line in clearLines:
+            if line in self.warnings:
+                self.warnings.remove(line)
+
+        # If this is the primary tab, register cleared lines
+        if self.isPrimary:
+            self.tabWidget.cleared.addClearedLines(clearLines)
+
+        # Refresh the displayed warnings
         self.refreshWarnings()
 
     def refreshWarnings(self):
         """Redraw all warnings from internal list."""
         self.clear()
+
         for warning in self.warnings:
             self.appendHtml(f'<font color="white">{warning}</font>')
-        self.controlPanel.updateStatusIcon(True)
+
+        self.ensureCursorVisible()
+
+        if self.isPrimary:
+            self.controlPanel.updateStatusIcon(True)
 
     def scream(self, status, message):
         """Add a new warning if control panel is online."""
-        if self.controlPanel.isOnline:
+        if self.isPrimary and self.controlPanel.isOnline:
             self.newLine(status, message)
             self.controlPanel.updateStatusIcon(True)
 
     def any(self):
         """Check if any warnings exist."""
         return bool(self.warnings)
+
+
+class ClearedWarningBuffer(CurrentWarningBuffer):
+    """Buffer to display, manage, and clear warnings."""
+
+    def __init__(self, controlPanel):
+        super().__init__(controlPanel, isPrimary=False)
+
+    def addClearedLines(self, lines):
+        self.warnings.extend(lines)
+        self.refreshWarnings()
 
 
 class WarningPanel(ControlPanel):
@@ -297,7 +345,7 @@ class WarningsDialog(ControlDialog):
         tabWidget.addTab(warningPanel, title)
 
     @property
-    def pannels(self):
+    def panels(self):
         """Return all warning panels in the tab widget."""
         return [self.tabWidget.widget(i) for i in range(self.tabWidget.count())]
 
@@ -316,7 +364,7 @@ class WarningsDialog(ControlDialog):
             return
 
         widget = tabWidget.widget(index)
-        for panel in self.pannels:
+        for panel in self.panels:
             panel.hideAll()
 
         widget.showAll()
