@@ -39,5 +39,5 @@ class RoughDialog(ControlDialog):
         #self.tabWidget.addTab(self.pumpPanel, 'Pump')
 
     @property
-    def pannels(self):
+    def panels(self):
         return [self.gaugePanel, self.pumpPanel]

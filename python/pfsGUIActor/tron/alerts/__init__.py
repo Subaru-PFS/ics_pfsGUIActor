@@ -250,7 +250,7 @@ class AlertsDialog(ControlDialog):
             tabWidget.setUsesScrollButtons(False)
 
     @property
-    def pannels(self):
+    def panels(self):
         return sum([[tabWidget.widget(i) for i in range(tabWidget.count())] for tabWidget in self.tabWidgets], [])
 
     @property
@@ -275,8 +275,8 @@ class AlertsDialog(ControlDialog):
 
         widget = tabWidget.widget(index)
 
-        for pannel in self.pannels:
-            pannel.hideAll()
+        for panel in self.panels:
+            panel.hideAll()
 
         widget.showAll()
         QTimer.singleShot(10, self.adjustSize)

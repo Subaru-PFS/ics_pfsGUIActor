@@ -113,5 +113,5 @@ class HxDialog(ControlDialog):
         return self.moduleRow.camRow.controlDialog.cmdBuffer
 
     @property
-    def pannels(self):
+    def panels(self):
         return [self.hxPanel]

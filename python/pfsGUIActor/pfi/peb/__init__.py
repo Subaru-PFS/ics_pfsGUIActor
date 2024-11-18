@@ -96,7 +96,7 @@ class PebDialog(ControlDialog):
     # self.tabWidget.addTab(telemetryPanel, 'Telemetry')
 
     # @property
-    # def pannels(self):
+    # def panels(self):
     #     return [self.flowPanel, self.tempsPanel, self.powerPanel, self.ledPanel]
     #
     #

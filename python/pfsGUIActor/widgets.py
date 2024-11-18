@@ -381,7 +381,7 @@ class Controllers(ValueGB):
     def updateWidgets(self, controllers=None):
         controllers = self.keyvar.getValue(doRaise=False) if controllers is None else controllers
 
-        for widget in self.moduleRow.widgets + self.moduleRow.controlDialog.pannels:
+        for widget in self.moduleRow.widgets + self.moduleRow.controlDialog.panels:
             if not widget.controllerName:
                 continue
 
