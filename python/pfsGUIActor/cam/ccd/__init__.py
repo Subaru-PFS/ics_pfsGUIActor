@@ -97,5 +97,5 @@ class CcdDialog(ControlDialog):
         return self.moduleRow.camRow.controlDialog.cmdBuffer
 
     @property
-    def pannels(self):
+    def panels(self):
         return [self.ccdPanel, self.feePanel]

@@ -239,7 +239,7 @@ class XcuDialog(ControlDialog):
         return self.moduleRow.camRow.controlDialog.cmdBuffer
 
     @property
-    def pannels(self):
+    def panels(self):
         return [self.pcmPanel, self.motorsPanel, self.GVPanel, self.interlockPanel, self.turboPanel, self.ionpumpPanel,
                 self.gaugePanel, self.tempsPanel, self.heatersPanel] + self.coolerPanels
 

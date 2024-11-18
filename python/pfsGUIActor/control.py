@@ -102,7 +102,7 @@ class ControlDialog(QDialog):
         return RawLogArea(self.moduleRow.actorName)
 
     @property
-    def pannels(self):
+    def panels(self):
         return [self.tabWidget.widget(i) for i in range(self.tabWidget.count())]
 
     def addCommand(self, button, cmdStr):
@@ -130,7 +130,7 @@ class ControlDialog(QDialog):
         self.hide()
 
     def setEnabled(self, a0: bool):
-        for widget in [self.topbar] + self.pannels:
+        for widget in [self.topbar] + self.panels:
             widget.setEnabled(a0)
 
 
