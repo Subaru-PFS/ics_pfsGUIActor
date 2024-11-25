@@ -26,11 +26,11 @@ class HxRead(ValuesRow):
 class HxPanel(CamDevice):
 
     def __init__(self, controlDialog):
-        CamDevice.__init__(self, controlDialog, 'Hx')
+        # There is hxhal controller but the logic is quite different from the other controllers.
+        CamDevice.__init__(self, controlDialog, controllerName='')
         self.addCommandSet(HxCommands(self))
 
     def createWidgets(self):
-
         self.rampConfig = RampConfig(self.moduleRow)
         self.hxRead = HxRead(self.moduleRow)
         self.filename = ValueGB(self.moduleRow, 'filename', 'filepath', 0, '{:s}')
@@ -48,3 +48,11 @@ class HxPanel(CamDevice):
 class HxCommands(ControllerCmd):
     def __init__(self, controlPanel):
         ControllerCmd.__init__(self, controlPanel)
+
+    def setEnabled(self, a0: bool):
+        """Just disable connect / disconnect."""
+        super().setEnabled(a0)
+        self.connectButton.setEnabled(False)
+        self.connectButton.setVisible(False)
+        self.disconnectButton.setEnabled(False)
+        self.disconnectButton.setVisible(True)
