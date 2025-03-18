@@ -172,7 +172,7 @@ class CurrentWarningBuffer(QPlainTextEdit):
         self.warnings = []  # Stores warning lines
 
         # UI setup
-        self.setMinimumSize(720, 180)
+        self.setMinimumSize(980, 180)
         self.setMaximumBlockCount(10000)
         self.setReadOnly(True)
         self.setStyleSheet("background-color: black; color: white;")
