@@ -70,7 +70,7 @@ class WarningVal(ValueGB):
 
 class WarningKey(ValuesRow):
     """Creates widgets to display and control warnings based on model and config."""
-    translate = {int: '{:g}', float: '{:g}', str: '{:s}'}
+    translate = {int: '{:g}', float: '{:g}', str: '{:s}', 'hash':'0x{:016x}'}
 
     def __init__(self, model, keyDescription, keyConfig):
         self.model = model
@@ -100,6 +100,7 @@ class WarningKey(ValuesRow):
                 widget = WarningVal(self.model, keyVar.name, name, i, WarningKey.translate[type],
                                     warningLogic=warningFactory.build(keyDescription, **keyConfig))
             else:
+                type = 'hash' if name in ['designId'] else type
                 widget = ValueGB(self.model, keyVar.name, name, i, WarningKey.translate[type])
 
             self.widgets.append(widget)
