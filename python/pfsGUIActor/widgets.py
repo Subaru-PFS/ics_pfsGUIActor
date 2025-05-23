@@ -37,8 +37,12 @@ class ValueGB(QGroupBox):
         values = keyvar.getValue(doRaise=False)
         values = (values,) if not isinstance(values, tuple) else values
 
-        value = values[ind]
-        strValue = self.toString(fmt, value)
+        if not len(values):
+            strValue = 'nan'
+        else:
+            value = values[ind]
+            strValue = self.toString(fmt, value)
+
         self.setText(strValue)
         self.moduleRow.mwindow.heartBeat()
 
