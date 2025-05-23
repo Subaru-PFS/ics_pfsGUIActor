@@ -23,6 +23,8 @@ class RampState(StaticValueGB):
 class RampProgress(QProgressBar):
     def __init__(self, rampState):
         QProgressBar.__init__(self)
+        self.nreset = 1
+        self.nread = 1
         self.rampState = rampState
         self.hxRow = rampState.moduleRow
         self.hxRow.keyVarDict['ramp'].addCallback(self.setRampConfig, callNow=False)

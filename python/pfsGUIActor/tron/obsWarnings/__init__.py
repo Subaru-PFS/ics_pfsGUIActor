@@ -70,7 +70,7 @@ class WarningVal(ValueGB):
 
 class WarningKey(ValuesRow):
     """Creates widgets to display and control warnings based on model and config."""
-    translate = {int: '{:g}', float: '{:g}', str: '{:s}', 'hash':'0x{:016x}'}
+    translate = {int: '{:g}', float: '{:g}', str: '{:s}', 'hash': '0x{:016x}'}
 
     def __init__(self, model, keyDescription, keyConfig):
         self.model = model

@@ -1,9 +1,11 @@
 __author__ = 'alefur'
 
 from pfsGUIActor.common import ComboBox, CheckBox, GridLayout
-from pfsGUIActor.control import ControllerPanel, ControllerCmd
-from pfsGUIActor.widgets import Coordinates, ValueGB, CmdButton, DoubleSpinBoxGB, CustomedCmd, AbortButton, CriticalSwitchGB
+from pfsGUIActor.control import ControllerPanel
 from pfsGUIActor.enu import EnuDeviceCmd
+from pfsGUIActor.widgets import Coordinates, ValueGB, CmdButton, DoubleSpinBoxGB, CustomedCmd, AbortButton, \
+    CriticalSwitchGB
+
 
 class CoordBoxes(GridLayout):
     def __init__(self):
@@ -18,6 +20,7 @@ class CoordBoxes(GridLayout):
         for i, spinbox in enumerate(self.widgets):
             self.addWidget(spinbox, i // 3, i % 3)
 
+
 class InitCmd(CustomedCmd):
     def __init__(self, controlPanel):
         CustomedCmd.__init__(self, controlPanel=controlPanel, buttonLabel='INIT')
@@ -29,6 +32,7 @@ class InitCmd(CustomedCmd):
     def buildCmd(self):
         skipHoming = 'skipHoming' if self.skipHoming.isChecked() else ''
         return '%s slit init %s' % (self.controlPanel.actorName, skipHoming)
+
 
 class MoveCmd(CustomedCmd):
     def __init__(self, controlPanel):
@@ -133,7 +137,7 @@ class SlitCommands(EnuDeviceCmd):
         self.enableButton = CmdButton(controlPanel=controlPanel, label='ENABLE',
                                       cmdStr='%s slit enable' % controlPanel.actorName)
         self.disableButton = CmdButton(controlPanel=controlPanel, label='DISABLE',
-                                      cmdStr='%s slit disable' % controlPanel.actorName)
+                                       cmdStr='%s slit disable' % controlPanel.actorName)
         self.coordBoxes = CoordBoxes()
 
         self.moveCmd = MoveCmd(controlPanel=controlPanel)

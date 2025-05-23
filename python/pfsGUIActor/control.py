@@ -216,10 +216,34 @@ class ControllerPanel(ControlPanel):
     def __init__(self, controlDialog, controllerName, tabWidget=None):
         self.controllerName = controllerName
         ControlPanel.__init__(self, controlDialog=controlDialog, tabWidget=tabWidget)
+        self.settingControllerName()
 
     def setEnabled(self, a0):
         a0 = self.controllerName in self.moduleRow.keyVarDict['controllers'] if a0 else False
         ControlPanel.setEnabled(self, a0)
+
+    def settingControllerName(self):
+        """Recursively set controllerName and enabled state for all widgets in the layout."""
+
+        def applyRecursively(layout):
+            for i in range(layout.count()):
+                item = layout.itemAt(i)
+
+                if isinstance(item, QSpacerItem):
+                    continue
+
+                elif isinstance(item, QLayout):
+                    applyRecursively(item)  # Recurse into nested layout
+
+                elif item.widget() is not None:
+                    widget = item.widget()
+                    widget.controllerName = self.controllerName
+                    widget.setEnabled(self.controlDialog.moduleRow.isOnline)
+
+                    if hasattr(widget, 'grid'):
+                        applyRecursively(widget.grid)
+
+        applyRecursively(self.grid)
 
 
 class ControllerCmd(CommandsGB):
