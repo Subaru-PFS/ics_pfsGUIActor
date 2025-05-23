@@ -3,7 +3,6 @@ __author__ = 'alefur'
 from functools import partial
 
 import pfsGUIActor.styles as styles
-from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QFont, QColor
 from PyQt5.QtWidgets import QLabel, QGroupBox, QMessageBox
 from pfsGUIActor.common import PushButton, DoubleSpinBox, SpinBox, GridLayout, GBoxGrid, Label
@@ -13,6 +12,7 @@ convertText = {'on': 'ON', 'off': 'OFF', 'nan': 'nan', 'undef': 'undef', 'pendin
 
 class ValueGB(QGroupBox):
     def __init__(self, moduleRow, key, title, ind, fmt, fontSize=styles.smallFont, callNow=False):
+        self.controllerName = ''
         self.moduleRow = moduleRow
         self.keyvar = moduleRow.keyVarDict[key]
         self.title = title
@@ -88,6 +88,9 @@ class ValueGB(QGroupBox):
         return background, police
 
     def setEnabled(self, isOnline):
+        if self.controllerName and self.controllerName not in self.moduleRow.controllers.controllerNames:
+            isOnline = False
+
         if not isOnline:
             self.setColor(*styles.colorWidget('offline'))
 
@@ -377,7 +380,7 @@ class CustomedCmd(GridLayout):
 class Controllers(ValueGB):
     def __init__(self, moduleRow):
         ValueGB.__init__(self, moduleRow, 'controllers', 'Controllers', 0, '{:s}', fontSize=styles.bigFont)
-        QTimer.singleShot(10000, self.updateWidgets)
+        self.controllerNames = []
 
     def updateVals(self, ind, fmt, keyvar):
         self.updateWidgets(keyvar.getValue(doRaise=False))
@@ -386,10 +389,9 @@ class Controllers(ValueGB):
         controllers = self.keyvar.getValue(doRaise=False) if controllers is None else controllers
 
         for widget in self.moduleRow.widgets + self.moduleRow.controlDialog.panels:
-            if not widget.controllerName:
-                continue
+            widget.setEnabled(self.moduleRow.isOnline)
 
-            widget.setEnabled(widget.controllerName in controllers)
+        self.controllerNames = controllers
 
 
 class ValueMRow(ValueGB):
