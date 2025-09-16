@@ -8,14 +8,14 @@ import ics.utils.instdata.io as instdataIO
 import pfsGUIActor.styles as styles
 import pfsGUIActor.tron.obsWarnings.warningFactory as warningFactory
 from PyQt5.QtCore import QTimer
-from PyQt5.QtGui import QFont, QTextCursor
+from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QPlainTextEdit, QMenu
+from opscore.utility.qstr import qstr
 from pfsGUIActor.common import TabWidget
 from pfsGUIActor.control import ControlDialog, ControlPanel
 from pfsGUIActor.logs import CmdLogArea
 from pfsGUIActor.modulerow import ModuleRow
-from pfsGUIActor.widgets import ValueMRow
-from pfsGUIActor.widgets import ValuesRow, ValueGB
+from pfsGUIActor.widgets import ValueGB, StaticValueGB, ValueMRow
 
 
 class Model:
@@ -41,15 +41,9 @@ class Model:
     def isOnline(self):
         return self.actorName in self.hubModuleRow.keyVarDict['actors']
 
-    def addWarning(self, keyDescription, keyConfig):
-        """Add a warning key based on description and config."""
-        self.key = WarningKey(self, keyDescription, keyConfig)
-        return self.key
-
-    def warn(self, message):
-        """Send a warning message based on current status."""
-        currentStatus = [widget.value.text() for widget in self.key.widgets]
-        self.controlPanel.warningBuffer.scream(f'{self.key.keyName}={",".join(currentStatus)}', message)
+    def warn(self, keyDescription, warningStr):
+        """Send a warning warningStr based on current status."""
+        self.controlPanel.warningBuffer.scream(self.actorName, keyDescription, warningStr)
 
 
 class WarningVal(ValueGB):
@@ -57,26 +51,34 @@ class WarningVal(ValueGB):
     Represents a warning value with logic to check and alert for warnings.
     """
 
-    def __init__(self, *args, warningLogic=None, **kwargs):
+    def __init__(self, *args, warningLogic=None, keyDescription=None, **kwargs):
         self.warningLogic = warningLogic
+        self.keyDescription = keyDescription
         super().__init__(*args, **kwargs)
 
-    def setText(self, txt):
-        super().setText(txt)
-        status = self.warningLogic.check(txt)
-        if status != 'OK':
-            self.moduleRow.warn(status)
+    def toString(self, fmt, value):
+        """"""
+        if value is not None:
+            status = self.warningLogic.check(value)
+
+            if status != 'OK':
+                self.moduleRow.warn(self.keyDescription, status)
+
+        return super().toString(fmt, value)
 
 
-class WarningKey(ValuesRow):
+# class WarningLogic(StaticValueGB):
+
+
+class WarningKey:
     """Creates widgets to display and control warnings based on model and config."""
     translate = {int: '{:g}', float: '{:g}', str: '{:s}', 'hash': '0x{:016x}'}
 
     def __init__(self, model, keyDescription, keyConfig):
-        self.model = model
         self.widgets = []
+        self.model = model
         self.keyName = self.createWidgets(keyDescription, keyConfig)
-        super().__init__(self.widgets, title='')
+        # super().__init__(self.widgets, title='')
 
     def getKeyNameAndIdentifier(self, keyDescription):
         """Extract key name and identifier from description."""
@@ -96,14 +98,17 @@ class WarningKey(ValuesRow):
             index = [inf[0] for inf in infos].index(identifier)
 
         for i, (name, type) in enumerate(infos):
-            if i == index:
-                widget = WarningVal(self.model, keyVar.name, name, i, WarningKey.translate[type],
-                                    warningLogic=warningFactory.build(keyDescription, **keyConfig))
-            else:
-                type = 'hash' if name in ['designId'] else type
-                widget = ValueGB(self.model, keyVar.name, name, i, WarningKey.translate[type])
+            if i != index:
+                continue
 
-            self.widgets.append(widget)
+            widget = WarningVal(self.model, keyVar.name, 'value', i, WarningKey.translate[type],
+                                keyDescription=keyDescription,
+                                warningLogic=warningFactory.build(keyDescription, **keyConfig))
+
+            name = StaticValueGB(self.model, 'key', keyDescription)
+            logic = StaticValueGB(self.model, 'logic', widget.warningLogic.describe())
+
+            self.widgets.extend([name, logic, widget])
 
         return keyName
 
@@ -148,6 +153,7 @@ class WarningBuffer(TabWidget):
     def __init__(self, controlPanel):
         super().__init__()
         self.controlPanel = controlPanel
+        self.padKeyCol = max([len(k) for k in controlPanel.config.keys()]) + 1
 
         self.current = CurrentWarningBuffer(self)
         self.cleared = ClearedWarningBuffer(self)
@@ -162,6 +168,10 @@ class WarningBuffer(TabWidget):
         return self.current.scream(*args, **kwargs)
 
 
+import html
+from PyQt5.QtGui import QTextCursor
+
+
 class CurrentWarningBuffer(QPlainTextEdit):
     """Buffer to display, manage, and clear warnings."""
 
@@ -172,7 +182,7 @@ class CurrentWarningBuffer(QPlainTextEdit):
         self.warnings = []  # Stores warning lines
 
         # UI setup
-        self.setMinimumSize(980, 180)
+        self.setMinimumSize(600, 180)
         self.setMaximumBlockCount(10000)
         self.setReadOnly(True)
         self.setStyleSheet("background-color: black; color: white;")
@@ -182,14 +192,22 @@ class CurrentWarningBuffer(QPlainTextEdit):
     def controlPanel(self):
         return self.tabWidget.controlPanel
 
-    def newLine(self, status, message):
+    def appendLine(self, line, color="white"):
+        cursor = self.textCursor()
+        cursor.movePosition(QTextCursor.End)
+        self.setTextCursor(cursor)
+        # insert the colored, space-preserving line
+        cursor.insertHtml(f'<span style="white-space: pre; color:{color}">{html.escape(line)}</span>')
+        cursor.insertBlock()  # ← optional: adds exactly one line break
+
+    def newLine(self, actorName, keyDescription, warningStr):
         """Add a warning with timestamp and formatted color."""
         timestamp = dt.now().strftime('%Y-%m-%d %H:%M:%S')
-        line = f"{timestamp} {status} {message}"
+        line = f"{timestamp} {actorName} {keyDescription.ljust(self.tabWidget.padKeyCol)} warning={qstr(warningStr)}"
         self.warnings.append(line)
 
         color, _ = styles.colorWidget(CmdLogArea.colorCode['i'])
-        self.appendHtml(f'\n<font color="{color}">{line}</font>')
+        self.appendLine(line, color=color)
         self.ensureCursorVisible()
 
     def contextMenuEvent(self, event):
@@ -233,18 +251,18 @@ class CurrentWarningBuffer(QPlainTextEdit):
         """Redraw all warnings from internal list."""
         self.clear()
 
-        for warning in self.warnings:
-            self.appendHtml(f'<font color="white">{warning}</font>')
+        for line in self.warnings:
+            self.appendLine(line, color='white')
 
         self.ensureCursorVisible()
 
         if self.isPrimary:
             self.controlPanel.updateStatusIcon(True)
 
-    def scream(self, status, message):
+    def scream(self, *args, **kwargs):
         """Add a new warning if control panel is online."""
         if self.isPrimary and self.controlPanel.isOnline:
-            self.newLine(status, message)
+            self.newLine(*args, **kwargs)
             self.controlPanel.updateStatusIcon(True)
 
     def any(self):
@@ -279,10 +297,12 @@ class WarningPanel(ControlPanel):
     def createWidgets(self):
         """Initialize widgets based on configuration."""
         for iRow, keyConfig in enumerate(self.config.items()):
-            row = self.model.addWarning(*keyConfig)
-            self.grid.addWidget(row, iRow, 0)
+            name, logic, value = WarningKey(self.model, *keyConfig).widgets
+            self.grid.addWidget(name, iRow, 0)
+            self.grid.addWidget(logic, iRow, 1)
+            self.grid.addWidget(value, iRow, 2)
 
-        self.grid.addWidget(self.warningBuffer, iRow + 1, 0)
+        self.grid.addWidget(self.warningBuffer, iRow + 1, 0, 1, 3)
 
     def setInLayout(self):
         """Placeholder for layout spacer setup."""
