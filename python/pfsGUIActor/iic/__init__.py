@@ -26,19 +26,21 @@ class PfsConfigRow(RowWidget):
 
         self.designId = ValueMRow(self.moduleRow, 'pfsConfig', 'pfsConfigId', 0, '0x{:016x}')
         self.visit = ValueMRow(self.moduleRow, 'pfsConfig', 'visitId', 1, '{:d}')
-        self.dateDir = ValueMRow(self.moduleRow, 'pfsConfig', 'dateDir', 2, '{:s}')
-        self.raBoresight = ValueMRow(self.moduleRow, 'pfsConfig', 'raBoresight', 3, '{:.5f}')
-        self.decBoresight = ValueMRow(self.moduleRow, 'pfsConfig', 'decBoresight', 4, '{:.5f}')
-        self.posAng = ValueMRow(self.moduleRow, 'pfsConfig', 'posAng', 5, '{:.5f}')
-        self.designName = ValueMRow(self.moduleRow, 'pfsConfig', 'designName', 6, '{:s}')
+        self.visit0 = ValueMRow(self.moduleRow, 'pfsConfig', 'visit0', 2, '{:d}')
+        self.dateDir = ValueMRow(self.moduleRow, 'pfsConfig', 'dateDir', 3, '{:s}')
+        self.raBoresight = ValueMRow(self.moduleRow, 'pfsConfig', 'raBoresight', 4, '{:.5f}')
+        self.decBoresight = ValueMRow(self.moduleRow, 'pfsConfig', 'decBoresight', 5, '{:.5f}')
+        self.posAng = ValueMRow(self.moduleRow, 'pfsConfig', 'posAng', 6, '{:.5f}')
+        self.designName = ValueMRow(self.moduleRow, 'pfsConfig', 'designName', 7, '{:s}')
 
     @property
     def widgets(self):
-        return [self.designId, self.visit, self.dateDir, self.raBoresight, self.decBoresight, self.posAng, self.designName]
+        return [self.designId, self.visit, self.visit0, self.dateDir, self.raBoresight, self.decBoresight, self.posAng,
+                self.designName]
 
     @property
     def displayed(self):
-        return [None, self.designId, self.designName, self.dateDir, self.visit]
+        return [None, self.designId, self.designName, self.dateDir, self.visit, self.visit0]
 
 
 class IicRow(ModuleRow):
