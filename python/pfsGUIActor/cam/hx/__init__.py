@@ -2,7 +2,7 @@ __author__ = 'alefur'
 
 import pfsGUIActor.styles as styles
 from PyQt5.QtWidgets import QProgressBar
-from pfsGUIActor.cam.hx.panel import HxPanel
+from pfsGUIActor.cam.hx.panel import HxPanel, IRP
 from pfsGUIActor.control import ControlDialog, Topbar
 from pfsGUIActor.modulerow import ModuleRow
 from pfsGUIActor.widgets import Controllers, StaticValueGB
@@ -85,11 +85,12 @@ class HxRow(ModuleRow):
 
         self.controllers = Controllers(self)
         self.substate = RampState(self)
+        self.irp = IRP(self, fontSize=styles.bigFont)
         self.actorStatus.button.setEnabled(False)
 
     @property
     def widgets(self):
-        return [self.substate]
+        return [self.substate, self.irp]
 
     def setOnline(self):
         ModuleRow.setOnline(self)
