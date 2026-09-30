@@ -78,7 +78,7 @@ def main():
     hxs = ['hx_%s' % cam for cam in nircamNames]
     enus = ['enu_sm%i' % i for i in specIds]
     lam = ['aten', 'sac', 'breva']
-    sps = ['sps', 'dcb', 'dcb2', 'rough1', 'rough2']
+    sps = ['sps', 'iis', 'dcb', 'dcb2', 'rough1', 'rough2']
     pfi = ['peb', 'pfilamps']
     drp = ['drp', 'drp2']
 

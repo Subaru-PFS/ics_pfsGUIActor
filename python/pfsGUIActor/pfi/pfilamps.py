@@ -45,5 +45,6 @@ class PfiLampsCommands(CommandsGB):
     def __init__(self, controlPanel):
         CommandsGB.__init__(self, controlPanel)
 
-        self.allStatus = CmdButton(controlPanel=controlPanel, label='ALL STATUS', cmdStr='pfilamps allstat')
+        self.allStatus = CmdButton(controlPanel=controlPanel, label='ALL STATUS',
+                                   cmdStr=f'{controlPanel.actorName} allstat')
         self.grid.addWidget(self.allStatus, 1, 0)

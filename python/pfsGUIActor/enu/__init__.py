@@ -24,41 +24,15 @@ class EnuDeviceCmd(ControllerCmd):
 
 
 from pfsGUIActor.enu.bia import BiaPanel
-from pfsGUIActor.enu.iis import IisPanel
 from pfsGUIActor.enu.pdu import PduPanel
 from pfsGUIActor.enu.rexm import RexmPanel
 from pfsGUIActor.enu.shutters import ShuttersPanel
 from pfsGUIActor.enu.slit import SlitPanel
 from pfsGUIActor.enu.temps import TempsPanel
 from pfsGUIActor.modulerow import ModuleRow
-from pfsGUIActor.widgets import CmdButton, ValueMRow, Controllers, CustomedCmd, SwitchMRow
+from pfsGUIActor.widgets import CmdButton, ValueMRow, Controllers, CustomedCmd
 from pfsGUIActor.common import ComboBox, GridLayout
 import pfsGUIActor.styles as styles
-
-
-class IisCombined(SwitchMRow):
-    lamps = ['halogen', 'neon', 'argon', 'krypton']
-
-    def __init__(self, moduleRow):
-        class SingleIisLamp(SwitchMRow):
-            def __init__(self, iisCombined, lampName):
-                self.iisCombined = iisCombined
-                SwitchMRow.__init__(self, iisCombined.moduleRow, lampName, lampName, 0, '{:g}', controllerName='iis')
-
-            def setText(self, txt):
-                SwitchMRow.setText(self, txt)
-                self.iisCombined.setText(txt)
-
-        SwitchMRow.__init__(self, moduleRow, 'argon', 'IIS', 0, '{:g}')
-
-        self.lamps = [SingleIisLamp(self, lamp) for lamp in IisCombined.lamps]
-
-    def setText(self, txt):
-        states = [lamp.value.text() for lamp in self.lamps]
-        state = 'ON' if any([state == 'ON' for state in states]) else 'OFF'
-
-        self.value.setText(state)
-        self.customize()
 
 
 class BiaStatus(ValueMRow):
@@ -138,7 +112,6 @@ class EnuRow(ModuleRow):
         self.slit = ValueMRow(self, 'slitPosition', 'Slit', 0, '{:s}', controllerName='slit')
         self.shutters = ValueMRow(self, 'shutters', 'Shutters', 0, '{:s}', controllerName='biasha')
         self.bia = BiaStatus(self)
-        self.iis = IisCombined(self)
 
         self.controllers = Controllers(self)
 
@@ -146,7 +119,7 @@ class EnuRow(ModuleRow):
 
     @property
     def widgets(self):
-        return [self.state, self.substate, self.rexm, self.slit, self.shutters, self.bia, self.iis]
+        return [self.state, self.substate, self.rexm, self.slit, self.shutters, self.bia]
 
 
 class ConnectButton(CmdButton):
@@ -195,7 +168,7 @@ class EnuDialog(ControlDialog):
 
         self.stopButton = CmdButton(controlPanel=None, label=' STOP ', controlDialog=self,
                                     cmdStr='%s stop' % self.moduleRow.actorName)
-        self.connectCmd = ConnectCmd(self, ['rexm', 'biasha', 'slit', 'temps', 'pdu', 'iis'])
+        self.connectCmd = ConnectCmd(self, ['rexm', 'biasha', 'slit', 'temps', 'pdu'])
 
         self.topbar.addWidget(self.startButton)
         self.topbar.addWidget(self.stopButton)
@@ -208,7 +181,6 @@ class EnuDialog(ControlDialog):
         self.rexmPanel = RexmPanel(self)
         self.tempsPanel = TempsPanel(self)
         self.pduPanel = PduPanel(self)
-        self.iisPanel = IisPanel(self)
 
         self.tabWidget.addTab(self.slitPanel, 'FCA')
         self.tabWidget.addTab(self.shuttersPanel, 'SHUTTERS')
@@ -216,6 +188,5 @@ class EnuDialog(ControlDialog):
         self.tabWidget.addTab(self.rexmPanel, 'RDA')
         self.tabWidget.addTab(self.tempsPanel, 'TEMPS')
         self.tabWidget.addTab(self.pduPanel, 'PDU')
-        self.tabWidget.addTab(self.iisPanel, 'IIS')
 
         self.grid.addWidget(SubSystemLabel(f'SM{enuRow.module.specNum}', color='black', fontsize=20), 0, 8, 2, 1)
