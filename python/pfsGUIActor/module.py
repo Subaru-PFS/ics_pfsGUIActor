@@ -8,6 +8,7 @@ from pfsGUIActor.common import GridLayout
 from pfsGUIActor.enu import EnuRow
 from pfsGUIActor.gen2 import Gen2Row
 from pfsGUIActor.iic import IicRow
+from pfsGUIActor.iis import IisRow
 from pfsGUIActor.pfi.peb import PebRow
 from pfsGUIActor.pfi.pfilamps import PfiLampsRow
 from pfsGUIActor.sps import SpecModuleRow
@@ -69,13 +70,14 @@ class OperationModule(Module):
         self.gen2Row = Gen2Row(self)
         self.iicRow = IicRow(self)
         self.spsRow = SpecModuleRow(self)
+        self.iisRow = IisRow(self)
 
         self.populateLayout()
         self.grid.setContentsMargins(0, 0, 0, 0)
 
     @property
     def rows(self):
-        return [self.gen2Row] + self.iicRow.rows + [self.spsRow]
+        return [self.gen2Row] + self.iicRow.rows + [self.spsRow] + self.iisRow.rows
 
     def connect(self, specModules):
         """"""

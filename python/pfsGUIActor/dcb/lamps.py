@@ -19,7 +19,7 @@ from pfsGUIActor.lampUtils import getLampLabel
 
 class SwitchLamp(SwitchButton):
     def __init__(self, controlPanel, key, label=None, fmt='{:g}'):
-        label = key.capitalize() if label is None else label
+        label = getLampLabel(key) if label is None else label
         cmdStrOn = f'{controlPanel.actorName} arc on={key}'
         cmdStrOff = f'{controlPanel.actorName} arc off={key}'
         SwitchButton.__init__(self, controlPanel=controlPanel, key=key, label=label, fmt=fmt,
