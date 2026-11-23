@@ -1,7 +1,7 @@
 __author__ = 'alefur'
 
 import pfsGUIActor.styles as styles
-from PyQt5.QtWidgets import QProgressBar
+from PyQt5.QtWidgets import QMenu, QProgressBar
 from pfsGUIActor.cam.hx.panel import HxPanel, IRP
 from pfsGUIActor.control import ControlDialog, Topbar
 from pfsGUIActor.modulerow import ModuleRow
@@ -13,11 +13,29 @@ class RampState(StaticValueGB):
     def __init__(self, moduleRow):
         self.moduleRow = moduleRow
         self.controllerName = ''
+        self.isRamping = False
         StaticValueGB.__init__(self, moduleRow, '', 'IDLE', fontSize=styles.bigFont)
 
         self.rampProgress = RampProgress(self)
         self.grid.addWidget(self.rampProgress, 0, 0)
         self.setContentsMargins(0, 0, 0, 0)
+
+    def setEnabled(self, isOnline):
+        """Keep the ramp colour while a ramp is shown, rather than the idle default."""
+        if isOnline and self.isRamping:
+            self.setColor('skyblue')
+        else:
+            StaticValueGB.setEnabled(self, isOnline)
+
+    def contextMenuEvent(self, event):
+        """Offer to acknowledge a ramp left on display, e.g. one that failed, back to IDLE."""
+        if not self.isRamping:
+            return
+
+        menu = QMenu(self)
+        acknowledgeAction = menu.addAction("Acknowledge")
+        if menu.exec_(self.mapToGlobal(event.pos())) == acknowledgeAction:
+            self.rampProgress.doShow(False)
 
 
 class RampProgress(QProgressBar):
@@ -67,6 +85,7 @@ class RampProgress(QProgressBar):
             self.doShow(False)
 
     def doShow(self, show):
+        self.rampState.isRamping = show
         if show:
             self.show()
             self.rampState.setColor('skyblue')
