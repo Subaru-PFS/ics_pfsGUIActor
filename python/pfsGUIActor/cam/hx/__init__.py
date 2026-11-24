@@ -1,6 +1,9 @@
 __author__ = 'alefur'
 
+from functools import partial
+
 import pfsGUIActor.styles as styles
+from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QMenu, QProgressBar
 from pfsGUIActor.cam.hx.panel import HxPanel, IRP
 from pfsGUIActor.control import ControlDialog, Topbar
@@ -14,6 +17,7 @@ class RampState(StaticValueGB):
         self.moduleRow = moduleRow
         self.controllerName = ''
         self.isRamping = False
+        self.rampColor = 'skyblue'
         StaticValueGB.__init__(self, moduleRow, '', 'IDLE', fontSize=styles.bigFont)
 
         self.rampProgress = RampProgress(self)
@@ -23,7 +27,7 @@ class RampState(StaticValueGB):
     def setEnabled(self, isOnline):
         """Keep the ramp colour while a ramp is shown, rather than the idle default."""
         if isOnline and self.isRamping:
-            self.setColor('skyblue')
+            self.setColor(self.rampColor)
         else:
             StaticValueGB.setEnabled(self, isOnline)
 
@@ -39,11 +43,17 @@ class RampState(StaticValueGB):
 
 
 class RampProgress(QProgressBar):
+    # seconds without a read before a ramp is shown as stuck; twice that for the first, after the resets.
+    stuckTimeout = 30
+
     def __init__(self, rampState):
         QProgressBar.__init__(self)
         self.nreset = 1
         self.nread = 1
         self.rampState = rampState
+        self.watchdog = QTimer(self)
+        self.watchdog.setSingleShot(True)
+        self.watchdog.timeout.connect(partial(self.setRampColor, 'red'))
         self.hxRow = rampState.moduleRow
         self.hxRow.keyVarDict['ramp'].addCallback(self.setRampConfig, callNow=False)
         self.hxRow.keyVarDict['hxread'].addCallback(self.updateBar, callNow=False)
@@ -76,6 +86,10 @@ class RampProgress(QProgressBar):
 
         self.setValue(int(read))
 
+        if self.rampState.isRamping:
+            self.setRampColor('skyblue')
+            self.watchdog.start(self.stuckTimeout * 1000)
+
         if group == 0 and read == self.nreset:
             self.setRange(0, self.nread)
             self.setValue(0)
@@ -88,12 +102,19 @@ class RampProgress(QProgressBar):
         self.rampState.isRamping = show
         if show:
             self.show()
-            self.rampState.setColor('skyblue')
+            self.setRampColor('skyblue')
+            self.watchdog.start(2 * self.stuckTimeout * 1000)
             self.rampState.value.hide()
         else:
+            self.watchdog.stop()
             self.hide()
-            self.rampState.setColor('green')
+            self.rampState.setEnabled(self.hxRow.isOnline)
             self.rampState.value.show()
+
+    def setRampColor(self, color):
+        """Colour the box for the ramp on display, and keep that colour for setEnabled."""
+        self.rampState.rampColor = color
+        self.rampState.setEnabled(self.hxRow.isOnline)
 
 
 class HxRow(ModuleRow):
